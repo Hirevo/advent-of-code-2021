@@ -14,7 +14,7 @@ Here is how you can run each solutions:
 cargo run -- 1
 
 # This will run the solution for day 2.
-cargo run -- 1
+cargo run -- 2
 
 # And so on, up to day 24 ...
 ```
