@@ -4,26 +4,15 @@ use crate::Error;
 
 pub const INPUT_PATH: &str = "inputs/day03.txt";
 
-pub fn run() -> Result<(), Error> {
-    let input = fs::read_to_string(INPUT_PATH)?;
-
+fn part1(input: &[Vec<u8>]) -> Result<(), Error> {
     let width = input
-        .chars()
-        .position(|it| it == '\n')
+        .get(0)
+        .map(|it| it.len())
         .ok_or_else(|| Error::msg("invalid input"))?;
-
-    let values: Vec<Vec<u8>> = input
-        .lines()
-        .map(|it| {
-            it.chars()
-                .flat_map(|it| char::to_digit(it, 2).map(|it| it as u8))
-                .collect()
-        })
-        .collect();
 
     let (gamma_rate, epsilon_rate) = (0..width)
         .try_fold((0usize, 0usize), |(a, b), idx| {
-            let count = values.iter().try_fold(0isize, |acc, it| {
+            let count = input.iter().try_fold(0isize, |acc, it| {
                 it.get(width - idx - 1)
                     .map(|&it| if it == 1 { acc + 1 } else { acc - 1 })
             })?;
@@ -37,16 +26,36 @@ pub fn run() -> Result<(), Error> {
         .ok_or_else(|| Error::msg("invalid input"))?;
 
     println!("part1: {}", gamma_rate * epsilon_rate);
+    Ok(())
+}
 
+fn part2(input: &[Vec<u8>]) -> Result<(), Error> {
     let o2_rating =
-        apply_criteria(&values, |count| count >= 0).ok_or_else(|| Error::msg("invalid input"))?;
+        apply_criteria(input, |count| count >= 0).ok_or_else(|| Error::msg("invalid input"))?;
     let co2_rating =
-        apply_criteria(&values, |count| count < 0).ok_or_else(|| Error::msg("invalid input"))?;
+        apply_criteria(input, |count| count < 0).ok_or_else(|| Error::msg("invalid input"))?;
 
     let o2_rating = o2_rating.iter().fold(0, |acc, &it| acc << 1 | it as usize);
     let co2_rating = co2_rating.iter().fold(0, |acc, &it| acc << 1 | it as usize);
 
     println!("part2: {}", o2_rating * co2_rating);
+    Ok(())
+}
+
+pub fn run() -> Result<(), Error> {
+    let input = fs::read_to_string(INPUT_PATH)?;
+
+    let values: Vec<Vec<u8>> = input
+        .lines()
+        .map(|it| {
+            it.chars()
+                .flat_map(|it| char::to_digit(it, 2).map(|it| it as u8))
+                .collect()
+        })
+        .collect();
+
+    part1(values.as_slice())?;
+    part2(values.as_slice())?;
 
     Ok(())
 }

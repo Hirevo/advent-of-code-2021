@@ -11,6 +11,32 @@ enum Direction {
     Up,
 }
 
+fn part1(input: &[(Direction, usize)]) -> Result<(), Error> {
+    let (hpos, depth) = input
+        .iter()
+        .fold((0, 0), |(hpos, depth), &(dir, value)| match dir {
+            Direction::Forward => (hpos + value, depth),
+            Direction::Down => (hpos, depth + value),
+            Direction::Up => (hpos, depth - value),
+        });
+
+    println!("part1: {}", hpos * depth);
+    Ok(())
+}
+
+fn part2(input: &[(Direction, usize)]) -> Result<(), Error> {
+    let (hpos, depth, _) = input
+        .iter()
+        .fold((0, 0, 0), |(hpos, depth, aim), &(dir, value)| match dir {
+            Direction::Forward => (hpos + value, depth + aim * value, aim),
+            Direction::Down => (hpos, depth, aim + value),
+            Direction::Up => (hpos, depth, aim - value),
+        });
+
+    println!("part2: {}", hpos * depth);
+    Ok(())
+}
+
 pub fn run() -> Result<(), Error> {
     let input = fs::read_to_string(INPUT_PATH)?;
 
@@ -36,23 +62,8 @@ pub fn run() -> Result<(), Error> {
         })
         .collect::<Result<_, _>>()?;
 
-    let part1 = commands
-        .iter()
-        .fold((0, 0), |(hpos, depth), &(dir, value)| match dir {
-            Direction::Forward => (hpos + value, depth),
-            Direction::Down => (hpos, depth + value),
-            Direction::Up => (hpos, depth - value),
-        });
-    println!("part1: {}", part1.0 * part1.1);
-
-    let part2 = commands
-        .iter()
-        .fold((0, 0, 0), |(hpos, depth, aim), &(dir, value)| match dir {
-            Direction::Forward => (hpos + value, depth + aim * value, aim),
-            Direction::Down => (hpos, depth, aim + value),
-            Direction::Up => (hpos, depth, aim - value),
-        });
-    println!("part2: {}", part2.0 * part2.1);
+    part1(commands.as_slice())?;
+    part2(commands.as_slice())?;
 
     Ok(())
 }
