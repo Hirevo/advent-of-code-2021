@@ -1,0 +1,133 @@
+
+Day04 = (
+    | deck boards |
+
+    setup = (
+        | input |
+
+        input := system loadFile: 'inputs/day04.txt'.
+        input isNil ifTrue: [ self error: 'could not open input file' ].
+
+        input := input split: '\n\n'.
+        input := input reject: [ :it | it length = 0 ].
+        input := input asArray.
+
+        deck := input at: 1.
+        deck := deck split: ','.
+        deck := deck reject: [ :it | it length = 0 ].
+        deck := deck asArray.
+        deck := deck collect: [ :it | it asInteger ].
+
+        boards := input copyFrom: 2.
+        boards := boards collect: [ :it |
+            | rows |
+            rows := it split: '\n'.
+            rows := rows reject: [ :it | it length = 0 ].
+            rows := rows asArray.
+            rows collect: [ :it |
+                | cells |
+                cells := it split: ' '.
+                cells := cells reject: [ :it | it length = 0 ].
+                cells := cells asArray.
+                cells collect: [ :it | it asInteger ].
+            ].
+        ].
+    )
+
+    isWon: board with: marked = (
+        board do: [ :row |
+            | won |
+            won := row inject: true into: [ :acc :cell |
+                acc and: [ marked contains: cell ].
+            ].
+            won ifTrue: [ ^ true ].
+        ].
+
+        1 to: (board at: 1) length do: [ :idx |
+            | won |
+            won := board inject: true into: [ :acc :row |
+                | value |
+                value := row at: idx.
+                acc and: [ marked contains: value ].
+            ].
+            won ifTrue: [ ^ true ].
+        ].
+
+        ^ false.
+    )
+
+    findFirstWinningBoard = (
+        deck doIndexes: [ :idx |
+            | drawn |
+            drawn := deck copyFrom: 1 to: idx.
+            boards do: [ :board |
+                | won |
+                won := self isWon: board with: drawn.
+                won ifTrue: [ ^ Array with: board with: drawn ].
+            ].
+        ].
+
+        ^ nil.
+    )
+
+    findLastWinningBoard = (
+        | candidates last |
+        candidates := boards copyFrom: 1.
+
+        deck doIndexes: [ :idx |
+            | drawn |
+            last := candidates at: candidates length.
+            drawn := deck copyFrom: 1 to: idx.
+            candidates := candidates reject: [ :board | self isWon: board with: drawn ].
+            candidates := candidates asArray.
+            candidates length = 0 ifTrue: [ ^ Array with: last with: drawn ].
+        ].
+
+        ^ nil.
+    )
+
+    computeBoardScore: board with: marked = (
+        | score |
+
+        score := board inject: 0 into: [ :acc :row |
+            row do: [ :cell |
+                (marked contains: cell) ifFalse: [ acc := acc + cell ].
+            ].
+            acc.
+        ].
+
+        ^ score * (marked at: marked length)
+    )
+
+    part1 = (
+        | results board marked answer |
+
+        results := self findFirstWinningBoard.
+
+        board := results at: 1.
+        marked := results at: 2.
+
+        answer := self computeBoardScore: board with: marked.
+
+        'part1: ' print. answer println.
+    )
+
+    part2 = (
+        | results board marked answer |
+
+        results := self findLastWinningBoard.
+
+        board := results at: 1.
+        marked := results at: 2.
+
+        answer := self computeBoardScore: board with: marked.
+
+        'part2: ' print. answer println.
+    )
+
+    run: args = (
+        self setup.
+        self part1.
+        self part2.
+    )
+)

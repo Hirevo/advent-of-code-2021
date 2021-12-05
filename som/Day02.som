@@ -1,0 +1,67 @@
+
+Day02 = (
+    | input |
+
+    setup = (
+        input := system loadFile: 'inputs/day02.txt'.
+        input isNil ifTrue: [ self error: 'could not open input file' ].
+
+        input := input split: '\n'.
+        input := input reject: [ :it | it length = 0 ].
+        input := input asArray.
+
+        input := input collect: [ :it |
+            | parts |
+            parts := it split: ' '.
+            parts at: 1 put: (parts at: 1) asSymbol.
+            parts at: 2 put: (parts at: 2) asInteger.
+            parts.
+        ].
+    )
+
+    part1 = (
+        | hpos depth |
+
+        hpos := 0.
+        depth := 0.
+
+        input do: [ :it |
+            | dir value |
+            dir := it at: 1.
+            value := it at: 2.
+            dir = #forward ifTrue: [ hpos := hpos + value ].
+            dir = #down ifTrue: [ depth := depth + value ].
+            dir = #up ifTrue: [ depth := depth - value ].
+        ].
+
+        'part1: ' print. (hpos * depth) println.
+    )
+
+    part2 = (
+        | hpos depth aim |
+
+        hpos := 0.
+        depth := 0.
+        aim := 0.
+
+        input do: [ :it |
+            | dir value |
+            dir := it at: 1.
+            value := it at: 2.
+            dir = #forward ifTrue: [
+                hpos := hpos + value.
+                depth := aim * value + depth.
+            ].
+            dir = #down ifTrue: [ aim := aim + value ].
+            dir = #up ifTrue: [ aim := aim - value ].
+        ].
+
+        'part2: ' print. (hpos * depth) println.
+    )
+
+    run: args = (
+        self setup.
+        self part1.
+        self part2.
+    )
+)

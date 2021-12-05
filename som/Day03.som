@@ -1,0 +1,103 @@
+
+Day03 = (
+    | input |
+
+    setup = (
+        input := system loadFile: 'inputs/day03.txt'.
+        input isNil ifTrue: [ self error: 'could not open input file' ].
+
+        input := input split: '\n'.
+        input := input reject: [ :it | it length = 0 ].
+        input := input asArray.
+    )
+
+    raise: value power: pow = (
+        | result |
+        result := 1.
+        1 to: pow do: [ :it | result := result * value ].
+        ^ result.
+    )
+
+    binaryToInteger: bits = (
+        | length value |
+        value := 0.
+        length := bits length.
+        1 to: length do: [ :idx |
+            | bit factor |
+            bit := bits charAt: length - idx + 1.
+            factor := self raise: 2 power: idx - 1.
+            value := bit asInteger * factor + value.
+        ].
+        ^ value.
+    )
+
+    applyCriteria: predicate to: candidates = (
+        | head |
+
+        head := 1.
+        [ candidates length > 1 ] whileTrue: [
+            | count value |
+            count := candidates inject: 0 into: [ :acc :it |
+                | char |
+                char := it charAt: head.
+                char = '1' ifTrue: acc + 1 ifFalse: acc - 1.
+            ].
+            value := (predicate value: count) ifTrue: '1' ifFalse: '0'.
+            candidates := candidates reject: [ :it |
+                (it charAt: head) <> value.
+            ].
+            candidates := candidates asArray.
+            head := head + 1.
+        ].
+
+        ^ candidates at: 1.
+    )
+
+    constructBitField: predicate from: candidates = (
+        | head value |
+
+        head := 1.
+        value := ''.
+        1 to: (candidates at: 1) length do: [ :idx |
+            | count |
+            count := candidates inject: 0 into: [ :acc :it |
+                | char |
+                char := it charAt: idx.
+                char = '1' ifTrue: acc + 1 ifFalse: acc - 1.
+            ].
+            value := (predicate value: count) ifTrue: value + '1' ifFalse: value + '0'.
+        ].
+
+        ^ value.
+    )
+
+    part1 = (
+        | gammaRate epsilonRate |
+
+        gammaRate := self constructBitField: [ :count | count > 0 ] from: (input copyFrom: 1).
+        epsilonRate := self constructBitField: [ :count | count <= 0 ] from: (input copyFrom: 1).
+
+        gammaRate := self binaryToInteger: gammaRate.
+        epsilonRate := self binaryToInteger: epsilonRate.
+
+        'part1: ' print. (gammaRate * epsilonRate) println.
+    )
+
+    part2 = (
+        | o2Rating co2Rating |
+
+        o2Rating := self applyCriteria: [ :count | count >= 0 ] to: (input copyFrom: 1).
+        co2Rating := self applyCriteria: [ :count | count < 0 ] to: (input copyFrom: 1).
+
+        o2Rating := self binaryToInteger: o2Rating.
+        co2Rating := self binaryToInteger: co2Rating.
+
+        'part2: ' print. (o2Rating * co2Rating) println.
+    )
+
+    run: args = (
+        self setup.
+        self part1.
+        self part2.
+    )
+)

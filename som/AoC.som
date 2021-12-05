@@ -1,0 +1,20 @@
+
+AoC = (
+    run: args = (
+        | name value |
+
+        args length <> 2 ifTrue: [
+            'ERROR: expected exactly 1 argument: the day number' println.
+            system exit: 1.
+        ].
+
+        name := args at: 2.
+        name := name length = 1 ifTrue: 'Day0' + name ifFalse: 'Day' + name.
+        name := name asSymbol.
+
+        value := system load: name.
+        value := value new.
+
+        value run: args.
+    )
+)

@@ -1,0 +1,47 @@
+
+Day01 = (
+    | input |
+
+    setup = (
+        input := system loadFile: 'inputs/day01.txt'.
+        input isNil ifTrue: [ self error: 'could not open input file' ].
+
+        input := input split: '\n'.
+        input := input reject: [ :it | it length = 0 ].
+        input := input asArray.
+
+        input := input collect: [ :it | Integer fromString: it ].
+    )
+
+    part1 = (
+        | count |
+
+        count := 0.
+        2 to: input length do: [ :it |
+            (input at: it - 1) < (input at: it) ifTrue: [
+                count := count + 1.
+            ].
+        ].
+
+        'part1: ' print. count println.
+    )
+
+    part2 = (
+        | count |
+
+        count := 0.
+        4 to: input length do: [ :it |
+            (input at: it - 3) < (input at: it) ifTrue: [
+                count := count + 1.
+            ].
+        ].
+
+        'part2: ' print. count println.
+    )
+
+    run: args = (
+        self setup.
+        self part1.
+        self part2.
+    )
+)
