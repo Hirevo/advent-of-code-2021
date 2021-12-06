@@ -1,0 +1,82 @@
+
+Day05 = (
+    | input |
+
+    setup = (
+        input := system loadFile: 'inputs/day05.txt'.
+        input isNil ifTrue: [ self error: 'could not open input file' ].
+
+        input := input split: '\n'.
+        input := input reject: [ :it | it length = 0 ].
+        input := input asArray.
+
+        input := input collect: [ :line |
+            | parts |
+            parts := line split: ' -> '.
+            parts collect: [ :part |
+                | coords |
+                coords := part split: ','.
+                Point fromX: (coords at: 1) asInteger andY: (coords at: 2) asInteger.
+            ].
+        ].
+    )
+
+    countIntersections: segments = (
+        | seen |
+        seen := Hashtable new.
+
+        segments do: [ :pair |
+            | from to deltaX deltaY point target twice |
+            from := pair at: 1.
+            to := pair at: 2.
+            deltaX := to getX - from getX.
+            deltaY := to getY - from getY.
+            deltaX := deltaX = 0 ifTrue: 0 ifFalse: [ deltaX / deltaX abs ].
+            deltaY := deltaY = 0 ifTrue: 0 ifFalse: [ deltaY / deltaY abs ].
+            point := from clone.
+            target := to clone.
+            target setX: target getX + deltaX.
+            target setY: target getY + deltaY.
+            [ point <> target ] whileTrue: [
+                seen at: point clone put: (seen containsKey: point).
+                point setX: point getX + deltaX.
+                point setY: point getY + deltaY.
+            ].
+        ].
+
+        seen := seen values asArray.
+        seen := seen reject: [ :it | it not ].
+
+        ^ seen size
+    )
+
+    part1 = (
+        | segments answer |
+
+        segments := input reject: [ :pair |
+            | from to |
+            from := pair at: 1.
+            to := pair at: 2.
+            (from getX = to getX or: [ from getY = to getY ]) not.
+        ].
+        segments := segments asArray.
+
+        answer := self countIntersections: segments.
+
+        'part1: ' print. answer println.
+    )
+
+    part2 = (
+        | answer |
+
+        answer := self countIntersections: input.
+
+        'part2: ' print. answer println.
+    )
+
+    run: args = (
+        self setup.
+        self part1.
+        self part2.
+    )
+)

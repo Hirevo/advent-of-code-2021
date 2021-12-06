@@ -1,0 +1,56 @@
+
+Point = (
+    | x y |
+
+    getX = (
+        ^ x.
+    )
+
+    getY = (
+        ^ y.
+    )
+
+    setX: newX = (
+        x := newX.
+    )
+
+    setY: newY = (
+        y := newY.
+    )
+
+    = other = (
+        ^ x = other getX and: [ y = other getY ].
+    )
+
+    + other = (
+        x := x + other getX.
+        y := y + other getY.
+    )
+
+    hashcode = (
+        ^ 31 * x hashcode + y hashcode
+    )
+
+    clone = (
+        ^ Point fromX: x andY: y.
+    )
+
+    print = (
+        ('(' + x + ', ' + y + ')') print.
+    )
+
+    println = (
+        self print.
+        '' println.
+    )
+
+    -----------
+
+    fromX: x andY: y = (
+        | point |
+        point := self new.
+        point setX: x.
+        point setY: y.
+        ^ point.
+    )
+)
