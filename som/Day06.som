@@ -1,0 +1,87 @@
+
+Day06 = (
+    | input |
+
+    setup = (
+        input := system loadFile: 'inputs/day06.txt'.
+        input isNil ifTrue: [ self error: 'could not open input file' ].
+
+        " remove the newline "
+        (input endsWith: '\n') ifTrue: [
+            input := input substringFrom: 1 to: input length - 1.
+        ].
+
+        input := (input split: ',') collect: [ :it | it asInteger ].
+    )
+
+    naiveSolution: input for: dayCount = (
+        | population |
+
+        population := Vector new: input length.
+        population appendAll: input.
+
+        dayCount timesRepeat: [
+            | offsprings |
+            offsprings := 0.
+            population := population doIndexes: [ :idx |
+                | value |
+                value := population at: idx.
+                value = 0 ifTrue: [
+                    offsprings := offsprings + 1.
+                    population at: idx put: 6.
+                ] ifFalse: [
+                    population at: idx put: value - 1.
+                ].
+            ].
+            offsprings timesRepeat: [
+                population append: 8.
+            ].
+        ].
+
+        ^ population size.
+    )
+
+    cleverSolution: input for: dayCount = (
+        | groups |
+
+        groups := Array new: 9 withAll: 0.
+
+        input do: [ :it |
+            groups at: it + 1 put: (groups at: it + 1) + 1.
+        ].
+
+        dayCount timesRepeat: [
+            | temp |
+            temp := groups at: 1.
+            2 to: groups length do: [ :idx |
+                groups at: idx - 1 put: (groups at: idx).
+            ].
+            groups at: groups length put: temp.
+            groups at: 7 put: (groups at: 7) + (groups at: 9).
+        ].
+
+        ^ groups sum.
+    )
+
+    part1 = (
+        | answer |
+
+        answer := self cleverSolution: input for: 80.
+
+        'part1: ' print. answer println.
+    )
+
+    part2 = (
+        | answer |
+
+        answer := self cleverSolution: input for: 256.
+
+        'part2: ' print. answer println.
+    )
+
+    run: args = (
+        self setup.
+        self part1.
+        self part2.
+    )
+)
