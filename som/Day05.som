@@ -57,7 +57,7 @@ Day05 = (
             | from to |
             from := pair at: 1.
             to := pair at: 2.
-            (from getX = to getX or: [ from getY = to getY ]) not.
+            from getX <> to getX and: [ from getY <> to getY ].
         ].
         segments := segments asArray.
 
