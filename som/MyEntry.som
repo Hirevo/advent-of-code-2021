@@ -1,0 +1,25 @@
+
+MyEntry = (
+    | key value next |
+
+    key = ( ^ key )
+    key: newKey = ( key := newKey )
+
+    value = ( ^ value )
+    value: newValue = ( | last | last := value. value := newValue. ^ last )
+
+    " Private "
+    next = ( ^ next )
+    next: newNext = ( next := newNext )
+
+    ---------
+
+    new: newKey = ( ^ self new: newKey and: nil )
+    new: newKey and: newValue = (
+        | entry |
+        entry := self new.
+        entry key: newKey.
+        entry value: newValue.
+        ^ entry.
+    )
+)

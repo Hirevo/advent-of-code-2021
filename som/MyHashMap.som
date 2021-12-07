@@ -1,0 +1,115 @@
+
+MyHashMap = (
+    | table capacity size |
+
+    size = ( ^ size )
+    capacity = ( ^ capacity )
+
+    at: key = (
+        | hash head |
+        hash := (key hashcode % capacity) abs + 1.
+        head := table at: hash.
+
+        head ifNotNil: [
+            [ head next notNil ] whileTrue: [
+                head key = key ifTrue: [ ^ head value ].
+                head := head next.
+            ].
+            head key = key ifTrue: [ ^ head value ].
+        ].
+
+        ^ nil.
+    )
+
+    at: key put: value = (
+        | hash head |
+        hash := (key hashcode % capacity) abs + 1.
+        head := table at: hash.
+
+        head ifNil: [
+            table at: hash put: (MyEntry new: key and: value).
+            size := size + 1.
+        ] ifNotNil: [
+            [ head next notNil ] whileTrue: [
+                head key = key ifTrue: [ ^ head value: value ].
+                head := head next.
+            ].
+            head key = key ifTrue: [ ^ head value: value ].
+            head next: (MyEntry new: key and: value).
+            size := size + 1.
+        ].
+
+        ^ nil.
+    )
+
+    entry: key = (
+        | hash head entry |
+        hash := (key hashcode % capacity) abs + 1.
+        head := table at: hash.
+
+        head ifNil: [
+            entry := MyEntry new: key.
+            table at: hash put: entry.
+            size := size + 1.
+            ^ entry.
+        ] ifNotNil: [
+            [ head next notNil ] whileTrue: [
+                head key = key ifTrue: [ ^ head ].
+                head := head next.
+            ].
+            head key = key ifTrue: [ ^ head ].
+            entry := MyEntry new: key.
+            head next: entry.
+            size := size + 1.
+            ^ entry.
+        ].
+
+        ^ nil.
+    )
+
+    containsKey: key = (
+        | hash head |
+        hash := (key hashcode % capacity) abs + 1.
+        head := table at: hash.
+
+        head ifNotNil: [
+            [ head next notNil ] whileTrue: [
+                head key = key ifTrue: [ ^ true ].
+                head := head next.
+            ].
+            head key = key ifTrue: [ ^ true ].
+        ].
+
+        ^ false.
+    )
+
+    values = (
+        | output idx |
+        output := Array new: size.
+        idx := 1.
+        table do: [ :head |
+            [ head notNil ] whileTrue: [
+                output at: idx put: head value.
+                idx := idx + 1.
+                head := head next.
+            ]
+        ].
+        ^ output.
+    )
+
+    init: newCapacity = (
+        table := Array new: newCapacity.
+        capacity := newCapacity.
+        size := 0.
+    )
+
+    ---------
+
+    new = ( ^ self new: 100000 )
+    new: capacity = (
+        | map |
+        map := super new.
+        map init: capacity.
+        ^ map.
+    )
+)

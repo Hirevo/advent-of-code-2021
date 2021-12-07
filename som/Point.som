@@ -28,7 +28,7 @@ Point = (
     )
 
     hashcode = (
-        ^ 31 * x hashcode + y hashcode
+        ^ 524287 * x hashcode + y hashcode
     )
 
     clone = (

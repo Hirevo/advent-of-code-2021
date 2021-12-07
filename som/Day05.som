@@ -23,7 +23,7 @@ Day05 = (
 
     countIntersections: segments = (
         | seen |
-        seen := Hashtable new.
+        seen := MyHashMap new: 100000.
 
         segments do: [ :pair |
             | from to deltaX deltaY point target twice |
@@ -38,13 +38,15 @@ Day05 = (
             target setX: target getX + deltaX.
             target setY: target getY + deltaY.
             [ point <> target ] whileTrue: [
-                seen at: point clone put: (seen containsKey: point).
+                | entry |
+                entry := seen entry: point clone.
+                entry value: entry value notNil.
                 point setX: point getX + deltaX.
                 point setY: point getY + deltaY.
             ].
         ].
 
-        seen := seen values asArray.
+        seen := seen values.
         seen := seen reject: [ :it | it not ].
 
         ^ seen size
