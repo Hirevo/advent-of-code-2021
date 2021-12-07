@@ -1,5 +1,6 @@
 use std::fs;
 
+use crate::measured;
 use crate::Error;
 
 pub const INPUT_PATH: &str = "inputs/day02.txt";
@@ -62,8 +63,8 @@ pub fn run() -> Result<(), Error> {
         })
         .collect::<Result<_, _>>()?;
 
-    part1(commands.as_slice())?;
-    part2(commands.as_slice())?;
+    measured!(part1(commands.as_slice()))?;
+    measured!(part2(commands.as_slice()))?;
 
     Ok(())
 }

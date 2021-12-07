@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::fs;
 
+use crate::measured;
 use crate::Error;
 
 pub const INPUT_PATH: &str = "inputs/day05.txt";
@@ -87,8 +88,8 @@ pub fn run() -> Result<(), Error> {
         })
         .collect::<Result<_, Error>>()?;
 
-    part1(input.as_slice())?;
-    part2(input.as_slice())?;
+    measured!(part1(input.as_slice()))?;
+    measured!(part2(input.as_slice()))?;
 
     Ok(())
 }
