@@ -1,0 +1,64 @@
+
+Day07 = (
+    | input |
+
+    setup = (
+        input := system loadFile: 'inputs/day07.txt'.
+        input isNil ifTrue: [ self error: 'could not open input file' ].
+
+        " remove the newline "
+        (input endsWith: '\n') ifTrue: [
+            input := input substringFrom: 1 to: input length - 1.
+        ].
+
+        input := (input split: ',') collect: [ :it | it asInteger ].
+    )
+
+    median: data = (
+        | sorted mid |
+
+        sorted := data copy.
+        Sorter quicksort: sorted.
+
+        mid := sorted length / 2.
+
+        sorted length % 2 = 0 ifTrue: [ ^ sorted at: mid ].
+        ^ (sorted at: mid) + (sorted at: mid + 1) // 2.
+    )
+
+    sumUpTo: N = (
+        " closed form solution for summing all numbers up to N "
+        " https://en.wikipedia.org/wiki/1_%2B_2_%2B_3_%2B_4_%2B_⋯ "
+
+        ^ N + 1 * N / 2.
+    )
+
+    part1 = (
+        | answer median |
+
+        median := self median: input.
+        answer := input inject: 0 into: [ :acc :it | acc + (median - it) abs ].
+
+        'part1: ' print. answer println.
+    )
+
+    part2 = (
+        | answer average p1 p2 |
+
+        average := input average.
+
+        " we have to check both values on both sides of the average to find the lowest score "
+        p1 := input inject: 0 into: [ :acc :it | acc + (self sumUpTo: (average - it) abs) ].
+        p2 := input inject: 0 into: [ :acc :it | acc + (self sumUpTo: (average - it + 1) abs) ].
+
+        answer := p1 min: p2.
+
+        'part2: ' print. answer println.
+    )
+
+    run: args = (
+        self setup.
+        self part1.
+        self part2.
+    )
+)

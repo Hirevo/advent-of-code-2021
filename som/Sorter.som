@@ -1,0 +1,76 @@
+
+" implementations of sorting algorithms "
+Sorter = (
+    ---------
+
+    bubblesort: data = (
+        | sorted len |
+        len := data length.
+        sorted := false.
+        [ sorted ] whileFalse: [
+            sorted := true.
+            2 to: len do: [ :idx |
+                (data at: idx - 1) > (data at: idx) ifTrue: [
+                    | temp |
+                    temp := data at: idx - 1.
+                    data at: idx - 1 put: (data at: idx).
+                    data at: idx put: temp.
+                    sorted := false.
+                ].
+            ].
+            len := len - 1.
+        ].
+    )
+
+    quicksort: data = (
+        self quicksortImpl: data from: 1 to: data length.
+    )
+
+    quicksortImpl: data from: start to: end = (
+        | len pivot left right stop temp |
+        len := end - start + 1.
+        len < 2 ifTrue: [ ^ self ].
+        len = 2 ifTrue: [
+            (data at: start) > (data at: end) ifTrue: [
+                temp := data at: start.
+                data at: start put: (data at: end).
+                data at: end put: temp.
+            ].
+            ^ self.
+        ].
+
+        pivot := data at: start.
+        left := start + 1.
+        right := end.
+        stop := false.
+
+        [ left <= right and: stop not ] whileTrue: [
+            (data at: left) <= pivot ifTrue: [
+                left := left + 1.
+            ] ifFalse: [
+                (data at: right) > pivot ifTrue: [
+                    right = 1 ifTrue: [ stop := true. ] ifFalse: [
+                        right := right - 1.
+                    ].
+                ] ifFalse: [
+                    temp := data at: left.
+                    data at: left put: (data at: right).
+                    data at: right put: temp.
+                    left := left + 1.
+                    right = 1 ifTrue: [ stop := true. ] ifFalse: [
+                        right := right - 1.
+                    ].
+                ].
+            ].
+        ].
+
+        left := left - 1.
+
+        temp := data at: start.
+        data at: start put: (data at: left).
+        data at: left put: temp.
+
+        self quicksortImpl: data from: start to: left - 1.
+        self quicksortImpl: data from: left + 1 to: end.
+    )
+)
