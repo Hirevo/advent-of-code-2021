@@ -97,7 +97,7 @@ Day03 = (
 
     run: args = (
         self setup.
-        self part1.
-        self part2.
+        Timing measure: [ self part1 ].
+        Timing measure: [ self part2 ].
     )
 )

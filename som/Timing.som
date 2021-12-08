@@ -1,0 +1,40 @@
+
+Timing = (
+    ---------
+
+    format: micros = (
+        | units |
+
+        units := #(
+            #('days' 86400000000)
+            #( 'hrs'  3600000000)
+            #( 'min'    60000000)
+            #(   's'     1000000)
+            #(  'ms'        1000)
+            #(  'µs'           0)
+        ).
+
+        units do: [ :pair |
+            | unit threshold |
+            unit := pair at: 1.
+            threshold := pair at: 2.
+
+            micros >= threshold ifTrue: [
+                micros := micros // threshold.
+                (' -> solution ran in ' + micros + unit) println.
+                ^ self.
+            ].
+        ].
+    )
+
+    measure: blk = (
+        | micros value |
+        micros := system ticks.
+        value := blk value.
+        micros := system ticks - micros.
+
+        self format: micros.
+
+        ^ value.
+    )
+)
