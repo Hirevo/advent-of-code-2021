@@ -7,7 +7,7 @@ ArrayUtils = (
         array do: [ :it |
             (blk value: it) ifTrue: [ ^ it ].
         ].
-    
+
         ^ nil.
     )
 
@@ -15,7 +15,7 @@ ArrayUtils = (
         array doIndexes: [ :idx |
             (blk value: (array at: idx)) ifTrue: [ ^ idx ].
         ].
-    
+
         ^ nil.
     )
 )

@@ -32,7 +32,7 @@ Day08 = (
             ].
         ].
     )
-    
+
     " counts how many patterns are missing a given segment "
     countMissing: item in: patterns = (
         | count |
@@ -42,25 +42,25 @@ Day08 = (
         ].
         ^ count.
     )
-    
+
     " given the patterns, analyse them and infer wire/segment mappings "
     inferSegmentsMapping: patterns = (
         | segments one four seven eight known unknown |
-    
+
         segments := Array new: 7.
-    
+
         one := ArrayUtils find: [ :it | it size = 2 ] in: patterns.
         four := ArrayUtils find: [ :it | it size = 4 ] in: patterns.
         seven := ArrayUtils find: [ :it | it size = 3 ] in: patterns.
         eight := ArrayUtils find: [ :it | it size = 7 ] in: patterns.
-        
+
         " we create an array with the known digits. "
         known := Array new: 4.
         known at: 1 put: one.
         known at: 2 put: four.
         known at: 3 put: seven.
         known at: 4 put: eight.
-    
+
         " we create an array with the unknown digits. "
         unknown := patterns copy.
         unknown := unknown reject: [ :pattern | known contains: pattern ].
@@ -68,16 +68,16 @@ Day08 = (
 
         " we can find segment 1 because only that segment differs between 1 and 7. "
         segments at: 1 put: (seven - one) first.
-    
+
         " we can find segment 6 and 3 from their unique frequency among all patterns. "
         (one intersection: seven) do: [ :segment |
             | count |
             count := self countMissing: segment in: patterns.
-    
+
             " segment 6 is only missing in one pattern among all (other than segment 1). "
             (count = 1 and: [ segment <> (segments at: 1) ])
                 ifTrue: [ segments at: 6 put: segment ].
-    
+
             " segment 3 is only missing in two pattern among all. "
             count = 2 ifTrue: [ segments at: 3 put: segment ].
         ].
@@ -90,26 +90,26 @@ Day08 = (
 
             " segment 7 is never missing in any of the unknown digits. "
             (known not and: [ count = 0 ]) ifTrue: [ segments at: 7 put: ch ].
-    
+
             " segment 4 is only missing in one pattern among all. "
             (known not and: [ count = 1 ]) ifTrue: [ segments at: 4 put: ch ].
         ].
-    
+
         " we now know enough segments to single out segment 2 from the digit 4. "
         four do: [ :it |
             (segments contains: it) ifFalse: [ segments at: 2 put: it ].
         ].
-    
+
         " we can find segment 5 because it is the only one left. "
         #(#a #b #c #d #e #f #g) do: [ :ch | (segments contains: ch) ifFalse: [ segments at: 5 put: ch ] ].
-    
+
         ^ segments
     )
-    
+
     " given the wire/segment mappings, computes the wire/digit mappings. "
     mapToDigitMapping: segments = (
         | table |
-    
+
         " this table represents which segments are enabled, for each digit from 0 through 9. "
         table := #(
             #(1 2 3 5 6 7)
@@ -123,14 +123,14 @@ Day08 = (
             #(1 2 3 4 5 6 7)
             #(1 2 3 4 6 7)
         ).
-    
+
         table := table collect: [ :digit |
             | set |
             set := Set new.
             digit do: [ :segment | set add: (segments at: segment) ].
             set.
         ].
-    
+
         ^ table.
     )
 
