@@ -1,0 +1,21 @@
+
+" some convenience methods for working with arrays "
+ArrayUtils = (
+    ---------
+
+    find: blk in: array = (
+        array do: [ :it |
+            (blk value: it) ifTrue: [ ^ it ].
+        ].
+    
+        ^ nil.
+    )
+
+    findIndex: blk in: array = (
+        array doIndexes: [ :idx |
+            (blk value: (array at: idx)) ifTrue: [ ^ idx ].
+        ].
+    
+        ^ nil.
+    )
+)
