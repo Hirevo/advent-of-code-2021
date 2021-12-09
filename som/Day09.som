@@ -1,0 +1,118 @@
+
+Day09 = (
+    | input width height |
+
+    setup = (
+        input := system loadFile: 'inputs/day09.txt'.
+        input isNil ifTrue: [ self error: 'could not open input file' ].
+
+        input := input split: '\n'.
+        input := input reject: [ :it | it length = 0 ].
+        input := input asArray.
+
+        input := input collect: [ :line |
+            | row |
+            row := Array new: line length.
+            1 to: line length do: [ :idx | row at: idx put: (line charAt: idx) asInteger ].
+            row.
+        ].
+        
+        width := (input at: 1) length.
+        height := input length.
+    )
+
+    " generates all adjacent points, and invoke the block for each of them. "
+    adjacents: point do: blk = (
+        point getX > 1 ifTrue: [
+            blk value: (Point fromX: point getX - 1 andY: point getY).
+        ].
+        point getX < width ifTrue: [
+            blk value: (Point fromX: point getX + 1 andY: point getY).
+        ].
+        point getY > 1 ifTrue: [
+            blk value: (Point fromX: point getX andY: point getY - 1).
+        ].
+        point getY < height ifTrue: [
+            blk value: (Point fromX: point getX andY: point getY + 1).
+        ].
+    )
+
+    findLowPoints = (
+        | lowPoints |
+
+        lowPoints := Vector new.
+
+        1 to: height do: [ :y |
+            1 to: width do: [ :x |
+                | value point isLowPoint |
+                value := (input at: y) at: x.
+                point := Point fromX: x andY: y.
+
+                isLowPoint := true.
+                self adjacents: point do: [ :point |
+                    isLowPoint := isLowPoint and: [ value < ((input at: point getY) at: point getX) ].
+                ].
+
+                isLowPoint ifTrue: [ lowPoints append: point ].
+            ].
+        ].
+        
+        ^ lowPoints asArray.
+    )
+
+    " visits all adjacents points recursively, as long as the predicate holds. "
+    floodFill: point withSeen: seen = (
+        | current |
+
+        seen add: point.
+        current := (input at: point getY) at: point getX.
+
+        self adjacents: point do: [ :adjPoint |
+            | value valid |
+            value := (input at: adjPoint getY) at: adjPoint getX.
+
+            valid := current < value.
+            valid := valid and: [ (seen contains: adjPoint) not ].
+            valid := valid and: [ value < 9 ].
+
+            valid ifTrue: [ self floodFill: adjPoint withSeen: seen ].
+        ].
+    )
+
+    part1 = (
+        | answer width height lowPoints |
+
+        answer := self findLowPoints.
+        answer := answer collect: [ :point |
+            | value |
+            value := (input at: point getY) at: point getX.
+            value + 1.
+        ].
+        answer := answer sum.
+
+        'part1: ' print. answer println.
+    )
+
+    part2 = (
+        | answer |
+        
+        answer := self findLowPoints.
+        answer := answer collect: [ :point |
+            | seen |
+            seen := Set new.
+            self floodFill: point withSeen: seen.
+            seen size.
+        ].
+        Sorter quicksort: answer.
+        answer := answer copyFrom: answer length - 2.
+        answer := answer inject: 1 into: [ :acc :it | acc * it ].
+
+        'part2: ' print. answer println.
+    )
+
+    run: args = (
+        self setup.
+        Timing measure: [ self part1 ].
+        Timing measure: [ self part2 ].
+    )
+)

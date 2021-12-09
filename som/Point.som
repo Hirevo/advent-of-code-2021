@@ -21,6 +21,10 @@ Point = (
     = other = (
         ^ x = other getX and: [ y = other getY ].
     )
+    
+    == other = (
+        ^ (self = other).
+    )
 
     + other = (
         x := x + other getX.
