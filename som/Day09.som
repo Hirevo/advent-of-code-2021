@@ -16,7 +16,7 @@ Day09 = (
             1 to: line length do: [ :idx | row at: idx put: (line charAt: idx) asInteger ].
             row.
         ].
-        
+
         width := (input at: 1) length.
         height := input length.
     )
@@ -56,7 +56,7 @@ Day09 = (
                 isLowPoint ifTrue: [ lowPoints append: point ].
             ].
         ].
-        
+
         ^ lowPoints asArray.
     )
 
@@ -95,7 +95,7 @@ Day09 = (
 
     part2 = (
         | answer |
-        
+
         answer := self findLowPoints.
         answer := answer collect: [ :point |
             | seen |
