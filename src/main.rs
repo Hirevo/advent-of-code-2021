@@ -2,8 +2,8 @@
 
 use std::env;
 
-use color_eyre::eyre::Context;
-use color_eyre::Report;
+use stable_eyre::eyre::Context;
+use stable_eyre::Report;
 
 mod day01;
 mod day02;
@@ -20,7 +20,7 @@ mod timing;
 pub type Error = Report;
 
 fn main() -> Result<(), Error> {
-    color_eyre::install()?;
+    stable_eyre::install()?;
 
     let arg: usize = match env::args().nth(1) {
         Some(arg) => arg.parse().context("could not parse arg as a day number")?,
