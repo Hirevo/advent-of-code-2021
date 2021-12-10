@@ -1,8 +1,8 @@
-use std::fs;
 use std::collections::HashSet;
+use std::fs;
 
-use crate::Error;
 use crate::measured;
+use crate::Error;
 
 pub const INPUT_PATH: &str = "inputs/day09.txt";
 
@@ -27,7 +27,8 @@ fn part2(input: &[i64], width: usize, height: usize) -> Result<(), Error> {
             let mut seen = HashSet::new();
             flood_fill(input, *x, *y, width, height, &mut seen);
             seen.len()
-        }).collect();
+        })
+        .collect();
 
     basin_lengths.sort_unstable_by(|a, b| b.cmp(a));
 
@@ -102,7 +103,14 @@ fn find_low_points(input: &[i64], width: usize, height: usize) -> Vec<(usize, us
     low_points
 }
 
-fn flood_fill(input: &[i64], x: usize, y: usize, width: usize, height: usize, seen: &mut HashSet<(usize, usize)>) {
+fn flood_fill(
+    input: &[i64],
+    x: usize,
+    y: usize,
+    width: usize,
+    height: usize,
+    seen: &mut HashSet<(usize, usize)>,
+) {
     if !seen.insert((x, y)) {
         return;
     }
