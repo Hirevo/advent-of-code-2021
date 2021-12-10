@@ -1,0 +1,102 @@
+
+Day10 = (
+    | input |
+
+    setup = (
+        input := system loadFile: 'inputs/day10.txt'.
+        input isNil ifTrue: [ self error: 'could not open input file' ].
+
+        input := input split: '\n'.
+        input := input reject: [ :it | it length = 0 ].
+        input := input asArray.
+    )
+
+    part1 = (
+        | answer |
+
+        answer := input inject: 0 into: [ :acc :line |
+            | stack length idx error |
+            stack := Vector new.
+            length := line length.
+            idx := 1.
+
+            [ idx <= length and: error isNil ] whileTrue: [
+                | char |
+                char := line charAt: idx.
+                char = '(' ifTrue: [ stack append: char ].
+                char = '[' ifTrue: [ stack append: char ].
+                char = '{' ifTrue: [ stack append: char ].
+                char = '<' ifTrue: [ stack append: char ].
+                char = ')' ifTrue: [ stack remove = '(' ifFalse: [ error := char ] ].
+                char = ']' ifTrue: [ stack remove = '[' ifFalse: [ error := char ] ].
+                char = '}' ifTrue: [ stack remove = '{' ifFalse: [ error := char ] ].
+                char = '>' ifTrue: [ stack remove = '<' ifFalse: [ error := char ] ].
+                idx := idx + 1.
+            ].
+
+            error ifNotNil: [
+                error = ')' ifTrue: [ acc := acc + 3 ].
+                error = ']' ifTrue: [ acc := acc + 57 ].
+                error = '}' ifTrue: [ acc := acc + 1197 ].
+                error = '>' ifTrue: [ acc := acc + 25137 ].
+            ].
+
+            acc.
+        ].
+
+        'part1: ' print. answer println.
+    )
+
+    part2 = (
+        | answer |
+
+        answer := input collect: [ :line |
+            | stack length idx error score |
+            stack := Vector new.
+            length := line length.
+            idx := 1.
+
+            [ idx <= length and: error isNil ] whileTrue: [
+                | char |
+                char := line charAt: idx.
+                char = '(' ifTrue: [ stack append: char ].
+                char = '[' ifTrue: [ stack append: char ].
+                char = '{' ifTrue: [ stack append: char ].
+                char = '<' ifTrue: [ stack append: char ].
+                char = ')' ifTrue: [ stack remove = '(' ifFalse: [ error := char ] ].
+                char = ']' ifTrue: [ stack remove = '[' ifFalse: [ error := char ] ].
+                char = '}' ifTrue: [ stack remove = '{' ifFalse: [ error := char ] ].
+                char = '>' ifTrue: [ stack remove = '<' ifFalse: [ error := char ] ].
+                idx := idx + 1.
+            ].
+
+            (stack size > 0 and: error isNil) ifTrue: [
+                | char |
+                score := 0.
+                [ stack size > 0 ] whileTrue: [
+                    char := stack remove.
+                    char = '(' ifTrue: [ score := score * 5 + 1 ].
+                    char = '[' ifTrue: [ score := score * 5 + 2 ].
+                    char = '{' ifTrue: [ score := score * 5 + 3 ].
+                    char = '<' ifTrue: [ score := score * 5 + 4 ].
+                ].
+            ].
+
+            score
+        ].
+
+        answer := answer reject: [ :it | it isNil ].
+        answer := answer asArray.
+
+        Sorter quicksort: answer.
+        answer := answer at: answer length / 2 + 1.
+
+        'part2: ' print. answer println.
+    )
+
+    run: args = (
+        self setup.
+        Timing measure: [ self part1 ].
+        Timing measure: [ self part2 ].
+    )
+)
