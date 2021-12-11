@@ -1,0 +1,116 @@
+
+Day11 = (
+    | input width height |
+
+    setup = (
+        input := system loadFile: 'inputs/day11.txt'.
+        input isNil ifTrue: [ self error: 'could not open input file' ].
+
+        input := input split: '\n'.
+        input := input reject: [ :it | it length = 0 ].
+        input := input asArray.
+
+        input := input collect: [ :line |
+            | row |
+            width := line length.
+            row := Array new: width.
+            1 to: width do: [ :idx |
+                row at: idx put: (line charAt: idx) asInteger.
+            ].
+            row.
+        ].
+        height := input length.
+    )
+
+    " calls the given block for all points around the specified one "
+    coordsAround: x and: y do: blk = (
+        | offsets |
+        offsets := #(
+            #(-1 -1)
+            #(-1  0)
+            #(-1  1)
+            #( 0 -1)
+            #( 0  1)
+            #( 1 -1)
+            #( 1  0)
+            #( 1  1)
+        ).
+
+        offsets do: [ :offset |
+            | newX newY |
+            newX := x + (offset at: 1).
+            newY := y + (offset at: 2).
+            (newX < 1 or: newX > width) ifFalse: [
+                (newY < 1 or: newY > height) ifFalse: [
+                    blk value: newX with: newY.
+                ].
+            ].
+        ].
+    )
+
+    " bumps by one the current point and recurses to bump those around, if a flash occurs "
+    bump: grid at: x and: y with: flashed = (
+        | point value |
+        point := Point fromX: x andY: y.
+        value := ((grid at: y) at: x) + 1.
+        (grid at: y) at: x put: value.
+        (value > 9 and: [ (flashed contains: point) not ]) ifTrue: [
+            flashed add: point.
+            self coordsAround: x and: y do: [ :x :y |
+                self bump: grid at: x and: y with: flashed.
+            ].
+        ].
+    )
+
+    " simulates one complete turn and returns the number of flashes that happened for that turn "
+    tick: grid = (
+        | flashed |
+        flashed := Set new.
+
+        1 to: height do: [ :y |
+            1 to: width do: [ :x |
+                self bump: grid at: x and: y with: flashed.
+            ].
+        ].
+
+        flashed do: [ :point |
+            ((grid at: point getY) at: point getX) > 9 ifTrue: [
+                (grid at: point getY) at: point getX put: 0.
+            ].
+        ].
+
+        ^ flashed size.
+    )
+
+    part1 = (
+        | answer grid |
+
+        answer := 0.
+        grid := input collect: [ :row | row copy ].
+
+        100 timesRepeat: [ answer := answer + (self tick: grid) ].
+
+        'part1: ' print. answer println.
+    )
+
+    part2 = (
+        | answer grid size turn |
+
+        size := width * height.
+        grid := input collect: [ :row | row copy ].
+
+        turn := 1.
+        [ answer isNil ] whileTrue: [
+            (self tick: grid) = size ifTrue: [ answer := turn ].
+            turn := turn + 1.
+        ].
+
+        'part2: ' print. answer println.
+    )
+
+    run: args = (
+        self setup.
+        Timing measure: [ self part1 ].
+        Timing measure: [ self part2 ].
+    )
+)
