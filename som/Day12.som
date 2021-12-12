@@ -1,0 +1,115 @@
+
+Day12 = (
+    | map |
+
+    setup = (
+        | input |
+        input := system loadFile: 'inputs/day12.txt'.
+        input isNil ifTrue: [ self error: 'could not open input file' ].
+
+        input := input split: '\n'.
+        input := input reject: [ :it | it length = 0 ].
+        input := input asArray.
+
+        map := MyHashMap new: 100.
+        input do: [ :line |
+            | parts a b |
+            parts := line split: '-'.
+            a := parts at: 1.
+            b := parts at: 2.
+            a := map entry: a.
+            b := map entry: b.
+            a value ifNil: [ a value: Vector new ].
+            b value ifNil: [ b value: Vector new ].
+            a value append: (parts at: 2).
+            b value append: (parts at: 1).
+        ].
+    )
+
+    isUppercase: string = (
+        | allowed |
+
+        " FIXME: isn't really there a better way to do this ?? "
+        allowed := #('A' 'B' 'C' 'D' 'E' 'F' 'G' 'H' 'I' 'J' 'K' 'L' 'M' 'N' 'O' 'P' 'Q' 'R' 'S' 'T' 'U' 'V' 'W' 'X' 'Y' 'Z').
+
+        1 to: string length do: [ :idx |
+            (allowed contains: (string charAt: idx)) ifFalse: [ ^ false ].
+        ].
+
+        ^ true.
+    )
+
+    " basically a brute-force, we search through all non-disqualified neighbours and count those that reaches the goal "
+    searchPart1: path = (
+        | current neighbours count |
+        current := path last.
+        current = 'end' ifTrue: [ ^ 1 ].
+
+        count := 0.
+        neighbours := map at: current.
+
+        neighbours do: [ :neighbour |
+            ((self isUppercase: neighbour) or: [ (path contains: neighbour) not ]) ifTrue: [
+                path append: neighbour.
+                count := count + (self searchPart1: path).
+                path remove.
+            ].
+        ].
+
+        ^ count.
+    )
+
+    " same approach, with the possibility of a single second chance added into it "
+    searchPart2: path twiceUsed: twice = (
+        | current neighbours count |
+        current := path last.
+        current = 'end' ifTrue: [ ^ 1 ].
+
+        count := 0.
+        neighbours := map at: current.
+
+        neighbours do: [ :neighbour |
+            ((self isUppercase: neighbour) or: [ (path contains: neighbour) not ]) ifTrue: [
+                path append: neighbour.
+                count := count + (self searchPart2: path twiceUsed: twice).
+                path remove.
+            ] ifFalse: [
+                (twice not and: [ neighbour <> 'start' and: [ neighbour <> 'end' ] ]) ifTrue: [
+                    path append: neighbour.
+                    count := count + (self searchPart2: path twiceUsed: true).
+                    path remove.
+                ].
+            ].
+        ].
+
+        ^ count.
+    )
+
+    part1 = (
+        | answer initial |
+
+        initial := Vector new.
+        initial append: 'start'.
+
+        answer := self searchPart1: initial.
+
+        'part1: ' print. answer println.
+    )
+
+    part2 = (
+        | answer initial |
+
+        initial := Vector new.
+        initial append: 'start'.
+
+        answer := self searchPart2: initial twiceUsed: false.
+
+        'part2: ' print. answer println.
+    )
+
+    run: args = (
+        self setup.
+        Timing measure: [ self part1 ].
+        Timing measure: [ self part2 ].
+    )
+)
