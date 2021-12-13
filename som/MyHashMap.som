@@ -4,6 +4,8 @@ MyHashMap = (
 
     size = ( ^ size )
     capacity = ( ^ capacity )
+    
+    loadFactor = ( ^ 0.75 )
 
     at: key = (
         | hash head |
@@ -23,6 +25,8 @@ MyHashMap = (
 
     at: key put: value = (
         | hash head |
+        size >= (capacity * self loadFactor) ifTrue: [ self grow ].
+
         hash := (key hashcode % capacity) abs + 1.
         head := table at: hash.
 
@@ -44,6 +48,8 @@ MyHashMap = (
 
     entry: key = (
         | hash head entry |
+        size >= (capacity * self loadFactor) ifTrue: [ self grow ].
+
         hash := (key hashcode % capacity) abs + 1.
         head := table at: hash.
 
@@ -92,10 +98,38 @@ MyHashMap = (
                 output at: idx put: head value.
                 idx := idx + 1.
                 head := head next.
-            ]
+            ].
         ].
         ^ output.
     )
+    
+    " Private "
+    grow = (
+        | newTable newCapacity |
+        newCapacity := capacity * 2.
+        newCapacity = 0 ifTrue: [ newCapacity := 16 ].
+        newTable := Array new: newCapacity.
+        table do: [ :entry |
+            [ entry notNil ] whileTrue: [
+                | hash head next |
+                hash := (entry key hashcode % newCapacity) abs + 1.
+                head := newTable at: hash.
+
+                head ifNil: [
+                    newTable at: hash put: entry.
+                ] ifNotNil: [
+                    [ head next notNil ] whileTrue: [ head := head next ].
+                    head next: entry.
+                ].
+
+                next := entry next.
+                entry next: nil.
+                entry := next.
+            ].
+        ].
+        table := newTable.
+        capacity := newCapacity.
+    )    
 
     init: newCapacity = (
         table := Array new: newCapacity.
@@ -105,7 +139,7 @@ MyHashMap = (
 
     ---------
 
-    new = ( ^ self new: 100000 )
+    new = ( ^ self new: 16 )
     new: capacity = (
         | map |
         map := super new.
