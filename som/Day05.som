@@ -23,7 +23,7 @@ Day05 = (
 
     countIntersections: segments = (
         | seen |
-        seen := MyHashMap new: 100000.
+        seen := MyHashMap new: 300000.
 
         segments do: [ :pair |
             | from to deltaX deltaY point target twice |

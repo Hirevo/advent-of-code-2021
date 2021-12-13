@@ -1,6 +1,6 @@
 
 Day12 = (
-    | map |
+    | map bigCaves |
 
     setup = (
         | input |
@@ -14,7 +14,7 @@ Day12 = (
         map := MyHashMap new: 100.
         input do: [ :line |
             | parts a b |
-            parts := line split: '-'.
+            parts := (line split: '-') collect: [ :it | it asSymbol ].
             a := parts at: 1.
             b := parts at: 2.
             a := map entry: a.
@@ -43,7 +43,7 @@ Day12 = (
     searchPart1: path = (
         | current neighbours count |
         current := path last.
-        current = 'end' ifTrue: [ ^ 1 ].
+        current = #end ifTrue: [ ^ 1 ].
 
         count := 0.
         neighbours := map at: current.
@@ -63,7 +63,7 @@ Day12 = (
     searchPart2: path twiceUsed: twice = (
         | current neighbours count |
         current := path last.
-        current = 'end' ifTrue: [ ^ 1 ].
+        current = #end ifTrue: [ ^ 1 ].
 
         count := 0.
         neighbours := map at: current.
@@ -74,10 +74,8 @@ Day12 = (
                 count := count + (self searchPart2: path twiceUsed: twice).
                 path remove.
             ] ifFalse: [
-                (twice not and: [ neighbour <> 'start' and: [ neighbour <> 'end' ] ]) ifTrue: [
-                    path append: neighbour.
+                (twice not and: [ neighbour <> #start and: [ neighbour <> #end ] ]) ifTrue: [
                     count := count + (self searchPart2: path twiceUsed: true).
-                    path remove.
                 ].
             ].
         ].
@@ -89,7 +87,7 @@ Day12 = (
         | answer initial |
 
         initial := Vector new.
-        initial append: 'start'.
+        initial append: #start.
 
         answer := self searchPart1: initial.
 
@@ -100,7 +98,7 @@ Day12 = (
         | answer initial |
 
         initial := Vector new.
-        initial append: 'start'.
+        initial append: #start.
 
         answer := self searchPart2: initial twiceUsed: false.
 
