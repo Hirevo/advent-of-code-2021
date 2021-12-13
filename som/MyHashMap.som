@@ -4,7 +4,7 @@ MyHashMap = (
 
     size = ( ^ size )
     capacity = ( ^ capacity )
-    
+
     loadFactor = ( ^ 0.75 )
 
     at: key = (
@@ -102,7 +102,7 @@ MyHashMap = (
         ].
         ^ output.
     )
-    
+
     " Private "
     grow = (
         | newTable newCapacity |
@@ -129,7 +129,7 @@ MyHashMap = (
         ].
         table := newTable.
         capacity := newCapacity.
-    )    
+    )
 
     init: newCapacity = (
         table := Array new: newCapacity.
