@@ -32,8 +32,10 @@ fn part2(dots: &HashSet<Point>, instrs: &[Instr]) -> Result<(), Error> {
         std::mem::swap(&mut from, &mut to);
         to.clear();
     }
-    
-    let (w, h) = from.iter().fold((0, 0), |(w, h), (x, y)| (w.max(*x), h.max(*y)));
+
+    let (w, h) = from
+        .iter()
+        .fold((0, 0), |(w, h), (x, y)| (w.max(*x), h.max(*y)));
 
     println!("part2:");
 
@@ -98,15 +100,11 @@ pub fn run() -> Result<(), Error> {
 fn fold(from: &HashSet<Point>, to: &mut HashSet<Point>, instr: Instr) {
     for (x, y) in from.iter().copied() {
         let point = match instr {
-            Instr::FoldX(value) if x > value => {
-                (value - (x - value), y)
-            }
-            Instr::FoldY(value) if y > value => {
-                (x, value - (y - value))
-            }
-            _ => (x, y)
+            Instr::FoldX(value) if x > value => (value - (x - value), y),
+            Instr::FoldY(value) if y > value => (x, value - (y - value)),
+            _ => (x, y),
         };
-        
+
         to.insert(point);
     }
 }
