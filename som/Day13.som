@@ -1,0 +1,119 @@
+
+Day13 = (
+    | dots instrs |
+
+    setup = (
+        | input |
+        input := system loadFile: 'inputs/day13.txt'.
+        input isNil ifTrue: [ self error: 'could not open input file' ].
+
+        input := input split: '\n\n'.
+        input := input reject: [ :it | it length = 0 ].
+        input := input asArray.
+        
+        dots := input at: 1.
+        dots := dots split: '\n'.
+        dots := dots collect: [ :line |
+            | parts |
+            parts := line split: ','.
+            Point fromX: (parts at: 1) asInteger andY: (parts at: 2) asInteger
+        ].
+
+        instrs := input at: 2.
+        instrs := instrs split: '\n'.
+        instrs := instrs reject: [ :it | it length = 0 ].
+        instrs := instrs asArray.
+        instrs := instrs collect: [ :line |
+            | parts axis |
+            parts := line split: '='.
+            axis := parts at: 1.
+            axis := axis charAt: axis length.
+            Array with: axis asSymbol with: (parts at: 2) asInteger.
+        ].
+
+        Debug anyLn: dots.
+        Debug anyLn: instrs.
+    )
+
+    " fold the given dots along the given value on the X axis "
+    foldX: fst into: snd at: x = (
+        fst do: [ :dot |
+            dot getX > x ifTrue: [ dot setX: x - (dot getX - x) ].
+            snd add: dot.
+        ].
+    )
+
+    " fold the given dots along the given value on the Y axis "
+    foldY: fst into: snd at: y = (
+        fst do: [ :dot |
+            dot getY > y ifTrue: [ dot setY: y - (dot getY - y) ].
+            snd add: dot.
+        ].
+    )
+
+    " fold the given dots along a given axis "
+    fold: fst into: snd along: axis at: value = (
+        axis = #x ifTrue: [ ^ self foldX: fst into: snd at: value ].
+        axis = #y ifTrue: [ ^ self foldY: fst into: snd at: value ].
+    )
+
+    part1 = (
+        | answer input instr |
+
+        instr := instrs at: 1.
+
+        input := Set new.
+        input addAll: (dots collect: [ :it | it clone ]).
+
+        answer := Set new.
+        self fold: input into: answer along: (instr at: 1) at: (instr at: 2).
+
+        'part1: ' print. answer size println.
+    )
+
+    part2 = (
+        | answer fst snd bounds |
+
+        fst := Set new.
+        fst addAll: (dots collect: [ :it | it clone ]).
+
+        snd := Set new.
+
+        instrs do: [ :instr |
+            self fold: fst into: snd along: (instr at: 1) at: (instr at: 2).
+            answer := fst.
+            fst := snd.
+            snd := answer.
+            snd clear.
+        ].
+
+        answer := fst.
+
+        bounds := Point fromX: 0 andY: 0.
+        answer do: [ :it |
+            bounds setX: (bounds getX max: it getX).
+            bounds setY: (bounds getY max: it getY).
+        ].
+
+        'part2:' println.
+
+        0 to: bounds getY do: [ :y |
+            0 to: bounds getX do: [ :x |
+                | point |
+                point := Point fromX: x andY: y.
+                (answer contains: point) ifTrue: [
+                    '#' print.
+                ] ifFalse: [
+                    ' ' print.
+                ].
+            ].
+            '' println.
+        ].
+    )
+
+    run: args = (
+        self setup.
+        Timing measure: [ self part1 ].
+        Timing measure: [ self part2 ].
+    )
+)
