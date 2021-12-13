@@ -10,7 +10,7 @@ Day13 = (
         input := input split: '\n\n'.
         input := input reject: [ :it | it length = 0 ].
         input := input asArray.
-        
+
         dots := input at: 1.
         dots := dots split: '\n'.
         dots := dots collect: [ :line |
@@ -30,69 +30,66 @@ Day13 = (
             axis := axis charAt: axis length.
             Array with: axis asSymbol with: (parts at: 2) asInteger.
         ].
+    )
 
-        Debug anyLn: dots.
-        Debug anyLn: instrs.
+    " deduplicates an array by passing its items through a set "
+    dedup: array = (
+        | set idx |
+        set := Set new.
+        set addAll: array.
+        array := Array new: set size.
+        idx := 1.
+        set do: [ :it |
+            array at: idx put: it.
+            idx := idx + 1.
+        ].
+        ^ array.
     )
 
     " fold the given dots along the given value on the X axis "
-    foldX: fst into: snd at: x = (
-        fst do: [ :dot |
+    foldX: dots at: x = (
+        dots do: [ :dot |
             dot getX > x ifTrue: [ dot setX: x - (dot getX - x) ].
-            snd add: dot.
         ].
+        ^ self dedup: dots.
     )
 
     " fold the given dots along the given value on the Y axis "
-    foldY: fst into: snd at: y = (
-        fst do: [ :dot |
+    foldY: dots at: y = (
+        dots do: [ :dot |
             dot getY > y ifTrue: [ dot setY: y - (dot getY - y) ].
-            snd add: dot.
         ].
+        ^ self dedup: dots.
     )
 
     " fold the given dots along a given axis "
-    fold: fst into: snd along: axis at: value = (
-        axis = #x ifTrue: [ ^ self foldX: fst into: snd at: value ].
-        axis = #y ifTrue: [ ^ self foldY: fst into: snd at: value ].
+    fold: grid along: axis at: value = (
+        axis = #x ifTrue: [ ^ self foldX: grid at: value ].
+        axis = #y ifTrue: [ ^ self foldY: grid at: value ].
     )
 
     part1 = (
         | answer input instr |
 
         instr := instrs at: 1.
+        input := dots collect: [ :it | it clone ].
+        answer := self fold: input along: (instr at: 1) at: (instr at: 2).
 
-        input := Set new.
-        input addAll: (dots collect: [ :it | it clone ]).
-
-        answer := Set new.
-        self fold: input into: answer along: (instr at: 1) at: (instr at: 2).
-
-        'part1: ' print. answer size println.
+        'part1: ' print. answer length println.
     )
 
     part2 = (
-        | answer fst snd bounds |
+        | answer input bounds |
 
-        fst := Set new.
-        fst addAll: (dots collect: [ :it | it clone ]).
-
-        snd := Set new.
-
-        instrs do: [ :instr |
-            self fold: fst into: snd along: (instr at: 1) at: (instr at: 2).
-            answer := fst.
-            fst := snd.
-            snd := answer.
-            snd clear.
+        input := dots collect: [ :it | it clone ].
+        answer := instrs inject: input into: [ :acc :instr |
+            self fold: input along: (instr at: 1) at: (instr at: 2).
         ].
 
-        answer := fst.
-
-        bounds := Point fromX: 0 andY: 0.
-        answer do: [ :it |
-            bounds setX: (bounds getX max: it getX).
-            bounds setY: (bounds getY max: it getY).
+        bounds := answer inject: (Point fromX: 0 andY: 0) into: [ :acc :it |
+            acc setX: (acc getX max: it getX).
+            acc setY: (acc getY max: it getY).
+            acc
         ].
 
         'part2:' println.
