@@ -99,7 +99,7 @@ Day13 = (
                 | point |
                 point := Point fromX: x andY: y.
                 (answer contains: point) ifTrue: [
-                    '#' print.
+                    '█' print.
                 ] ifFalse: [
                     ' ' print.
                 ].

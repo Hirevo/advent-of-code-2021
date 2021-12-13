@@ -42,7 +42,7 @@ fn part2(dots: &HashSet<Point>, instrs: &[Instr]) -> Result<(), Error> {
     for y in 0..=h {
         for x in 0..=w {
             if from.contains(&(x, y)) {
-                print!("#");
+                print!("█");
             } else {
                 print!(" ");
             }
