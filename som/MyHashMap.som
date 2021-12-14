@@ -178,7 +178,10 @@ MyHashMap = (
     )
 
     " clears the map, removing all entries, but keeping its current capacity "
-    clear = ( table putAll: nil )
+    clear = (
+        size := 0.
+        table putAll: nil.
+    )
 
     " runs the given block on every entry stored in the map "
     do: blk = (
