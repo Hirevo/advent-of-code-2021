@@ -13,7 +13,7 @@ Day09 = (
         input := input collect: [ :line |
             | row |
             row := Array new: line length.
-            1 to: line length do: [ :idx | row at: idx put: (line charAt: idx) asInteger ].
+            1 to: line length do: [ :idx | row at: idx put: (line charAt: idx) asInteger ].
             row.
         ].
 
