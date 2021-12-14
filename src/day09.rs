@@ -34,7 +34,7 @@ fn part2(input: &[i64], width: usize, height: usize) -> Result<(), Error> {
 
     let answer = basin_lengths.iter().take(3).fold(1, |acc, it| acc * it);
 
-    println!("part1: {}", answer);
+    println!("part2: {}", answer);
     Ok(())
 }
 
