@@ -1,5 +1,16 @@
+# Rust's compilation artifacts folder
 /target
+
+# Workspace-specific configuration folders for code editors
+/.nova
+/.vscode
+/.idea
+
+# Advent of Code inputs folder
 /inputs
+
+# Advent of Code download script
 /dl.sh
 
+# macOS cache file for `Finder.app`
 .DS_Store
