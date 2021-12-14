@@ -75,7 +75,9 @@ Day12 = (
                 path remove.
             ] ifFalse: [
                 (twice not and: [ neighbour <> #start and: [ neighbour <> #end ] ]) ifTrue: [
+                    path append: neighbour.
                     count := count + (self searchPart2: path twiceUsed: true).
+                    path remove.
                 ].
             ].
         ].
