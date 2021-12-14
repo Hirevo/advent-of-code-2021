@@ -18,6 +18,7 @@ mod day10;
 mod day11;
 mod day12;
 mod day13;
+mod day14;
 mod timing;
 
 pub type Error = Report;
@@ -47,6 +48,7 @@ fn main() -> Result<(), Error> {
         11 => day11::run(),
         12 => day12::run(),
         13 => day13::run(),
+        14 => day14::run(),
         n if (1..=24).contains(&n) => {
             println!("this day has not (yet) been solved !");
             Ok(())

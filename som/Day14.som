@@ -1,0 +1,141 @@
+
+Day14 = (
+    | initial fst last map |
+
+    setup = (
+        | input temp |
+        input := system loadFile: 'inputs/day14.txt'.
+        input isNil ifTrue: [ self error: 'could not open input file' ].
+
+        input := input split: '\n\n'.
+        input := input reject: [ :it | it length = 0 ].
+        input := input asArray.
+
+        temp := input at: 1.
+        fst := temp charAt: 1.
+        last := temp charAt: temp length.
+        initial := MyHashMap new.
+        2 to: temp length do: [ :idx |
+            | key entry |
+            key := (temp charAt: (idx - 1)) + (temp charAt: idx).
+            entry := initial entry: key.
+            entry value ifNil: [
+                entry value: 1.
+            ] ifNotNil: [
+                entry value: entry value + 1.
+            ].
+        ].
+
+        map := MyHashMap new.
+        temp := input at: 2.
+        temp := temp split: '\n'.
+        temp := temp reject: [ :it | it length = 0 ].
+        temp := temp asArray.
+        temp do: [ :line |
+            | parts |
+            parts := line split: ' -> '.
+            map at: (parts at: 1) put: (parts at: 2).
+        ].
+    )
+
+    replace: source into: output = (
+        | key value ch |
+        source do: [ :entry |
+            key := entry key.
+            value := entry value.
+            ch := map at: key.
+            ch ifNotNil: [
+                | it |
+
+                entry := output entry: (key charAt: 1) + ch.
+                entry value ifNil: [
+                    entry value: value.
+                ] ifNotNil: [
+                    entry value: entry value + value.
+                ].
+
+                entry := output entry: ch + (key charAt: 2).
+                entry value ifNil: [
+                    entry value: value.
+                ] ifNotNil: [
+                    entry value: entry value + value.
+                ].
+            ].
+        ].
+    )
+    
+    score: output = (
+        | line counts min max entry |
+
+        counts := MyHashMap new.
+        output do: [ :entry |
+            | entry2 |
+
+            entry2 := counts entry: (entry key charAt: 1).
+            entry2 value ifNil: [
+                entry2 value: entry value.
+            ] ifNotNil: [
+                entry2 value: entry2 value + entry value.
+            ].
+
+            entry2 := counts entry: (entry key charAt: 2).
+            entry2 value ifNil: [
+                entry2 value: entry value.
+            ] ifNotNil: [
+                entry2 value: entry2 value + entry value.
+            ].
+        ].
+
+        counts := counts values collect: [ :it | (it / 2) + (it % 2) ].
+        min := counts inject: nil into: [ :acc :it | acc ifNil: it ifNotNil: [ acc min: it ] ].
+        max := counts inject: nil into: [ :acc :it | acc ifNil: it ifNotNil: [ acc max: it ] ].
+
+        ^ max - min.
+    )
+
+    part1 = (
+        | answer fst snd |
+
+        fst := MyHashMap new.
+        initial do: [ :entry | fst at: entry key put: entry value ].
+        snd := MyHashMap new.
+
+        10 timesRepeat: [ :idx |
+            self replace: fst into: snd.
+            answer := fst.
+            fst := snd.
+            snd := answer.
+            snd clear.
+        ].
+
+        answer := self score: fst.
+
+        'part1: ' print. answer println.
+    )
+
+    part2 = (
+        | answer fst snd |
+        
+        fst := MyHashMap new.
+        initial do: [ :entry | fst at: entry key put: entry value ].
+        snd := MyHashMap new.
+        
+        40 timesRepeat: [
+            self replace: fst into: snd.
+            answer := fst.
+            fst := snd.
+            snd := answer.
+            snd clear.
+        ].
+        
+        answer := self score: fst.
+
+        'part2: ' print. answer println.
+    )
+
+    run: args = (
+        self setup.
+        Timing measure: [ self part1 ].
+        Timing measure: [ self part2 ].
+    )
+)
