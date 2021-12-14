@@ -6,10 +6,17 @@ MyEntry = (
     key: newKey = ( key := newKey )
 
     value = ( ^ value )
-    value: newValue = ( | last | last := value. value := newValue. ^ last )
+    value: newValue = (
+        | last |
+        last := value.
+        value := newValue.
+        ^ last
+    )
 
-    " Private "
+    " private "
     next = ( ^ next )
+
+    " private "
     next: newNext = ( next := newNext )
 
     ---------

@@ -1,4 +1,6 @@
 
+" a more featureful HashMap implementation than `Hashtable` "
+" (most notable: automatic resizing, customizable initial capacity, and the `#entry:` API) "
 MyHashMap = (
     | table capacity size |
 
@@ -7,22 +9,24 @@ MyHashMap = (
 
     loadFactor = ( ^ 0.75 )
 
+    " returns the value stored in the map associated to the given key "
     at: key = (
         | hash head |
         hash := (key hashcode % capacity) abs + 1.
         head := table at: hash.
 
-        head ifNotNil: [
-            [ head next notNil ] whileTrue: [
-                head key = key ifTrue: [ ^ head value ].
-                head := head next.
-            ].
+        head ifNil: [ ^ nil ].
+
+        [ head next notNil ] whileTrue: [
             head key = key ifTrue: [ ^ head value ].
+            head := head next.
         ].
+        head key = key ifTrue: [ ^ head value ].
 
         ^ nil.
     )
 
+    " inserts a value in the map associated to the given key "
     at: key put: value = (
         | hash head |
         size >= (capacity * self loadFactor) ifTrue: [ self grow ].
@@ -33,19 +37,22 @@ MyHashMap = (
         head ifNil: [
             table at: hash put: (MyEntry new: key and: value).
             size := size + 1.
-        ] ifNotNil: [
-            [ head next notNil ] whileTrue: [
-                head key = key ifTrue: [ ^ head value: value ].
-                head := head next.
-            ].
-            head key = key ifTrue: [ ^ head value: value ].
-            head next: (MyEntry new: key and: value).
-            size := size + 1.
+            ^ nil.
         ].
+
+        [ head next notNil ] whileTrue: [
+            head key = key ifTrue: [ ^ head value: value ].
+            head := head next.
+        ].
+        head key = key ifTrue: [ ^ head value: value ].
+
+        head next: (MyEntry new: key and: value).
+        size := size + 1.
 
         ^ nil.
     )
 
+    " returns (and creates, if needed) the entry for the given key in the map "
     entry: key = (
         | hash head entry |
         size >= (capacity * self loadFactor) ifTrue: [ self grow ].
@@ -58,52 +65,142 @@ MyHashMap = (
             table at: hash put: entry.
             size := size + 1.
             ^ entry.
-        ] ifNotNil: [
-            [ head next notNil ] whileTrue: [
-                head key = key ifTrue: [ ^ head ].
-                head := head next.
-            ].
+        ].
+
+        [ head next notNil ] whileTrue: [
             head key = key ifTrue: [ ^ head ].
-            entry := MyEntry new: key.
-            head next: entry.
-            size := size + 1.
-            ^ entry.
+            head := head next.
+        ].
+        head key = key ifTrue: [ ^ head ].
+
+        entry := MyEntry new: key.
+        head next: entry.
+        size := size + 1.
+
+        ^ entry.
+    )
+
+    " removes from the map the element associated with the given key "
+    remove: key = (
+        | hash head next |
+        hash := (key hashcode % capacity) abs + 1.
+        head := table at: hash.
+        head ifNil: [ ^ nil ].
+
+        head key = key ifTrue: [
+            table at: hash put: head next.
+            size := size - 1.
+            ^ head value.
+        ].
+        next := head next.
+
+        " TODO: change entry to be able to simply represent `no value`, to allow "
+        "       reusing entries instead of removing them outright from the map   "
+        [ next notNil ] whileTrue: [
+            next key = key ifTrue: [
+                head next: next next.
+                size := size - 1.
+                ^ next value.
+            ].
+            head := next.
+            next := head next.
         ].
 
         ^ nil.
     )
 
+    " returns whether the given key is stored within the map "
     containsKey: key = (
         | hash head |
         hash := (key hashcode % capacity) abs + 1.
         head := table at: hash.
 
-        head ifNotNil: [
-            [ head next notNil ] whileTrue: [
-                head key = key ifTrue: [ ^ true ].
-                head := head next.
-            ].
+        head ifNil: [ ^ false ].
+
+        [ head next notNil ] whileTrue: [
             head key = key ifTrue: [ ^ true ].
+            head := head next.
         ].
+        head key = key ifTrue: [ ^ true ].
 
         ^ false.
     )
 
-    values = (
+    " returns all entries (key/value pairs) stored in the map, as an array "
+    entries = (
         | output idx |
-        output := Array new: size.
         idx := 1.
+        output := Array new: size.
+
         table do: [ :head |
             [ head notNil ] whileTrue: [
-                output at: idx put: head value.
-                idx := idx + 1.
+                output at: idx put: head.
                 head := head next.
+                idx := idx + 1.
             ].
         ].
+
         ^ output.
     )
 
-    " Private "
+    " returns all keys stored in the map, as an array "
+    keys = (
+        | output idx |
+        idx := 1.
+        output := Array new: size.
+
+        table do: [ :head |
+            [ head notNil ] whileTrue: [
+                output at: idx put: head key.
+                head := head next.
+                idx := idx + 1.
+            ].
+        ].
+
+        ^ output copyFrom: 1 to: idx - 1.
+    )
+
+    " returns all values stored in the map, as an array "
+    values = (
+        | output idx |
+        idx := 1.
+        output := Array new: size.
+
+        table do: [ :head |
+            [ head notNil ] whileTrue: [
+                output at: idx put: head value.
+                head := head next.
+                idx := idx + 1.
+            ].
+        ].
+
+        ^ output.
+    )
+
+    " clears the map, removing all entries, but keeping its current capacity "
+    clear = ( table putAll: nil )
+
+    " runs the given block on every entry stored in the map "
+    do: blk = (
+        | head |
+        1 to: table length do: [ :idx |
+            head := table at: idx.
+            [ head notNil ] whileTrue: [
+                blk value: head.
+                head := head next.
+            ].
+        ]
+    )
+
+    " TODO: implement `MyHashMap>>#retain:` "
+    " TODO: implement `MyHashMap>>#shrinkToFit:` "
+    
+    " TODO: implement `MyHashMap>>#print` "
+    " TODO: implement `MyHashMap>>#println` "
+    
+    " TODO: implement `MyHashMap>>#asString` "
+
+    " private "
     grow = (
         | newTable newCapacity |
         newCapacity := capacity * 2.
@@ -131,19 +228,20 @@ MyHashMap = (
         capacity := newCapacity.
     )
 
-    init: newCapacity = (
+    " private "
+    initialize: newCapacity = (
         table := Array new: newCapacity.
         capacity := newCapacity.
         size := 0.
     )
 
-    ---------
+    --------------
 
     new = ( ^ self new: 16 )
     new: capacity = (
         | map |
         map := super new.
-        map init: capacity.
+        map initialize: capacity.
         ^ map.
     )
 )
