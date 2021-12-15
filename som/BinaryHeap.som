@@ -1,0 +1,110 @@
+
+" A Binary Heap implementation, which can be used as Priority Queue. "
+" It behaves like a max queue, but if you want a min queue instead, then "
+" use a class like `RevRankedValue` as the item, which inverses the ordering. "
+BinaryHeap = (
+    | storage size capacity |
+
+    size = ( ^ size )
+    capacity = ( ^ capacity )
+    isEmpty = ( ^ size = 0 )
+
+    asArray = ( ^ storage copyFrom: 1 to: size )
+
+    push: item = (
+        | idx |
+
+        size := size + 1.
+        size > capacity ifTrue: [ self grow ].
+        storage at: size put: item.
+
+        idx := size.
+        [ idx <> 1 and: [ (storage at: (self parent: idx)) < (storage at: idx) ] ] whileTrue: [
+            | temp |
+            temp := storage at: (self parent: idx).
+            storage at: (self parent: idx) put: (storage at: idx).
+            storage at: idx put: temp.
+            idx := self parent: idx.
+        ].
+    )
+
+    peek = ( ^ storage at: 1 )
+
+    pop = (
+        | value |
+
+        size = 0 ifTrue: [ ^ nil ].
+        size = 1 ifTrue: [ size := size - 1. ^ storage at: 1 ].
+
+        value := storage at: 1.
+        storage at: 1 put: (storage at: size).
+        storage at: size put: nil.
+        size := size - 1.
+
+        self fix: 1.
+
+        ^ value.
+    )
+
+    reprioritize: blk = (
+        1 to: size do: [ :idx | blk value: (storage at: idx) ].
+        self fix: 1.
+    )
+
+    " private "
+    parent: idx = ( ^ idx / 2 )
+
+    " private "
+    children: idx = ( ^ idx * 2 )
+
+    " private "
+    fix: idx = (
+        | left right biggest |
+        left := self children: idx.
+        right := left + 1.
+        biggest := idx.
+        (left <= size and: [ (storage at: left) > (storage at: biggest) ]) ifTrue: [
+            biggest := left.
+        ].
+        (right <= size and: [ (storage at: right) > (storage at: biggest) ]) ifTrue: [
+            biggest := right.
+        ].
+        biggest <> idx ifTrue: [
+            | temp |
+            temp := storage at: idx.
+            storage at: idx put: (storage at: biggest).
+            storage at: biggest put: temp.
+            self fix: biggest.
+        ].
+    )
+
+    " private "
+    grow = (
+        | newStorage |
+        capacity = 0 ifTrue: [
+            capacity := capacity + 1.
+        ] ifFalse: [
+            capacity := capacity * 2.
+        ].
+        newStorage := Array new: capacity.
+        storage doIndexes: [ :idx | newStorage at: idx put: (storage at: idx) ].
+        storage := newStorage.
+    )
+
+    " private "
+    init: newCapacity = (
+        storage := Array new: newCapacity.
+        capacity := newCapacity.
+        size := 0.
+    )
+
+    --------------
+
+    new = ( ^ self new: 0 )
+    new: capacity = (
+        | map |
+        map := super new.
+        map init: capacity.
+        ^ map.
+    )
+)

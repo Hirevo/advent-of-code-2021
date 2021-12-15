@@ -1,0 +1,31 @@
+
+" Similar to `RankedValue`, but inverses the scoring (lower is now better). "
+RevRankedValue = (
+    | value score |
+
+    value = ( ^ value )
+    score = ( ^ score )
+
+    value: newValue = ( value := newValue )
+    score: newScore = ( score := newScore )
+
+    initialize: newValue score: newScore = (
+        value := newValue.
+        score := newScore.
+    )
+
+    = other = ( ^ value = other value )
+    == other = ( ^ self = other )
+
+    < other = ( ^ score > other score )
+    > other = ( ^ score < other score )
+
+    ---------
+
+    new: value score: score = (
+        | it |
+        it := super new.
+        it initialize: value score: score.
+        ^ it.
+    )
+)

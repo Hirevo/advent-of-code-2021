@@ -1,0 +1,117 @@
+
+Day15 = (
+    | input width height |
+
+    setup = (
+        input := system loadFile: 'inputs/day15.txt'.
+        input isNil ifTrue: [ self error: 'could not open input file' ].
+
+        input := input split: '\n'.
+        input := input reject: [ :it | it length = 0 ].
+        input := input asArray.
+
+        input := input collect: [ :line |
+            | row |
+            width := line length.
+            row := Array new: width.
+            1 to: width do: [ :idx |
+                row at: idx put: (line charAt: idx) asInteger.
+            ].
+            row.
+        ].
+        height := input length.
+    )
+
+    " calls the given block for all points around the specified one "
+    coordsAround: x and: y in: width and: height do: blk = (
+        | offsets |
+        offsets := #(
+            #(-1  0)
+            #( 0 -1)
+            #( 0  1)
+            #( 1  0)
+        ).
+
+        offsets do: [ :offset |
+            | newX newY |
+            newX := x + (offset at: 1).
+            newY := y + (offset at: 2).
+            (newX < 0 or: newX >= width) ifFalse: [
+                (newY < 0 or: newY >= height) ifFalse: [
+                    blk value: newX with: newY.
+                ].
+            ].
+        ].
+    )
+
+    part1 = (
+        | answer source destination neighbours goal heuristic |
+
+        source := Point fromX: 0 andY: 0.
+        destination := Point fromX: width - 1 andY: height - 1.
+        neighbours := [ :point |
+            | neighbours risk |
+            neighbours := Vector new: 4.
+            self coordsAround: point getX and: point getY in: width and: height do: [ :x :y |
+                point := Point fromX: x andY: y.
+                risk := (input at: y + 1) at: x + 1.
+                risk := RevRankedValue new: point score: risk.
+                neighbours append: risk.
+            ].
+            neighbours
+        ].
+        goal := [ :point | point = destination ].
+        heuristic := [ :point | (destination getX - point getX) + (destination getY - point getY) ].
+
+        answer := PathFinder dijkstra: source through: neighbours towards: goal.
+        " answer := PathFinder astar: source through: neighbours towards: goal heuristic: heuristic. "
+
+        answer := answer inject: 0 into: [ :acc :point | acc + ((input at: point getY + 1) at: point getX + 1) ].
+        answer := answer - ((input at: 1) at: 1).
+
+        'part1: ' print. answer println.
+    )
+
+    part2 = (
+        | answer source destination neighbours goal heuristic newWidth newHeight |
+
+        newWidth := width * 5.
+        newHeight := height * 5.
+
+        source := Point fromX: 0 andY: 0.
+        destination := Point fromX: newWidth - 1 andY: newHeight - 1.
+        neighbours := [ :point |
+            | neighbours risk |
+            neighbours := Vector new: 4.
+            self coordsAround: point getX and: point getY in: newWidth and: newHeight do: [ :x :y |
+                point := Point fromX: x andY: y.
+                risk := (input at: y % height + 1) at: x % width + 1.
+                risk := risk + (y / height) + (x / width) - 1 % 9 + 1.
+                risk := RevRankedValue new: point score: risk.
+                neighbours append: risk.
+            ].
+            neighbours
+        ].
+        goal := [ :point | point = destination ].
+        heuristic := [ :point | (destination getX - point getX) + (destination getY - point getY) ].
+
+        answer := PathFinder dijkstra: source through: neighbours towards: goal.
+        " answer := PathFinder astar: source through: neighbours towards: goal heuristic: heuristic. "
+
+        answer := answer inject: 0 into: [ :acc :point |
+            | risk |
+            risk := (input at: point getY % height + 1) at: point getX % width + 1.
+            risk := risk + (point getY / height) + (point getX / width) - 1 % 9 + 1.
+            acc + risk
+        ].
+        answer := answer - ((input at: 1) at: 1).
+
+        'part2: ' print. answer println.
+    )
+
+    run: args = (
+        self setup.
+        Timing measure: [ self part1 ].
+        Timing measure: [ self part2 ].
+    )
+)

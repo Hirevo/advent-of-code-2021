@@ -1,0 +1,196 @@
+
+" Implementations of various pathfinding algorithms "
+PathFinder = (
+    -------------
+
+    " Breadth-First Search algorithm: finds the path that takes the least amount of steps to reach. "
+    " It doesn't take any cost information into account. "
+    breadthFirst: source through: neighbours towards: goal = (
+        | frontier cameFrom |
+
+        frontier := Vector new.
+        frontier append: source.
+
+        cameFrom := MyHashMap new: 1000.
+        cameFrom at: source put: #none.
+
+        [ frontier size > 0 ] whileTrue: [
+            | current |
+            current := frontier removeFirst.
+
+            (goal value: current) ifTrue: [
+                | path |
+                path := Vector new.
+
+                [ current <> source ] whileTrue: [
+                    path append: current.
+                    current := cameFrom at: current.
+                ].
+
+                path append: source.
+                ^ path asArray.
+            ].
+
+            (neighbours value: current) do: [ :next |
+                | entry |
+                entry := cameFrom entry: next.
+                entry value ifNil: [
+                    frontier append: next.
+                    entry value: current.
+                ].
+            ].
+        ].
+
+        ^ nil.
+    )
+
+    " Dijkstra's algorithm: finds the absolute shortest path, taking a cost value into account. "
+    " The path found is guaranteed to be the absolute shortest one. "
+    dijkstra: source through: neighbours towards: goal = (
+        | frontier cameFrom costSoFar |
+
+        frontier := BinaryHeap new: 1000.
+        frontier push: (RevRankedValue new: source score: 0).
+
+        cameFrom := MyHashMap new: 1000.
+        cameFrom at: source put: #none.
+
+        costSoFar := MyHashMap new: 1000.
+        costSoFar at: source put: 0.
+
+        [ frontier size > 0 ] whileTrue: [
+            | current |
+            current := frontier pop.
+
+            (goal value: current value) ifTrue: [
+                | path |
+                path := Vector new.
+                current := current value.
+
+                [ current <> source ] whileTrue: [
+                    path append: current.
+                    current := cameFrom at: current.
+                ].
+
+                path append: source.
+                ^ path asArray.
+            ].
+
+            (neighbours value: current value) do: [ :next |
+                | entry newCost |
+                newCost := (costSoFar at: current value) + next score.
+                entry := costSoFar entry: next value.
+                (entry value isNil or: [ newCost < entry value ]) ifTrue: [
+                    entry value ifNil: [
+                        next score: newCost.
+                        frontier push: next.
+                    ] ifNotNil: [
+                        frontier reprioritize: [ :it | it value = next value ifTrue: [ it score: newCost ] ].
+                    ].
+                    entry value: newCost.
+                    cameFrom at: next value put: current value.
+                ].
+            ].
+        ].
+
+        ^ nil.
+    )
+
+    " Greedy Best-First Search algorithm: similar to Dijkstra's algorithm, but always greedily dives "
+    " into what looks as the shortest path forward first, before looking at any other options. "
+    " NOTICE: This algorithm doesn't guarantee to find the shortest path. "
+    greedyBestFirst: source through: neighbours towards: goal heuristic: heuristic = (
+        | frontier cameFrom |
+
+        frontier := BinaryHeap new: 1000.
+        frontier push: (RevRankedValue new: source score: 0).
+
+        cameFrom := MyHashMap new: 1000.
+        cameFrom at: source put: #none.
+
+        [ frontier size > 0 ] whileTrue: [
+            | current |
+            current := frontier pop.
+
+            (goal value: current value) ifTrue: [
+                | path |
+                path := Vector new.
+                current := current value.
+
+                [ current <> source ] whileTrue: [
+                    path append: current.
+                    current := cameFrom at: current.
+                ].
+
+                path append: source.
+                ^ path asArray.
+            ].
+
+            (neighbours value: current value) do: [ :next |
+                | entry |
+                entry := cameFrom entry: next value.
+                entry value ifNil: [
+                    entry value: current value.
+                    next score: (heuristic value: next value).
+                    frontier push: next.
+                ].
+            ].
+        ].
+
+        ^ nil.
+    )
+
+    " The A* algorithm: an improvement over Dijkstra's algorithm for cases where an heuristic "
+    " can be given to prioritize the exploration of some paths over others. "
+    astar: source through: neighbours towards: goal heuristic: heuristic = (
+        | frontier cameFrom costSoFar |
+
+        frontier := BinaryHeap new: 1000.
+        frontier push: (RevRankedValue new: source score: 0).
+
+        cameFrom := MyHashMap new: 1000.
+        cameFrom at: source put: #none.
+
+        costSoFar := MyHashMap new: 1000.
+        costSoFar at: source put: 0.
+
+        [ frontier size > 0 ] whileTrue: [
+            | current |
+            current := frontier pop.
+
+            (goal value: current value) ifTrue: [
+                | path |
+                path := Vector new.
+                current := current value.
+
+                [ current <> source ] whileTrue: [
+                    path append: current.
+                    current := cameFrom at: current.
+                ].
+
+                path append: source.
+                ^ path asArray.
+            ].
+
+            (neighbours value: current value) do: [ :next |
+                | entry newCost |
+                newCost := (costSoFar at: current value) + next score.
+                entry := costSoFar entry: next value.
+                (entry value isNil or: [ newCost < entry value ]) ifTrue: [
+                    | priority |
+                    priority := newCost + (heuristic value: next value).
+                    entry value ifNil: [
+                        next score: priority.
+                        frontier push: next.
+                    ] ifNotNil: [
+                        frontier reprioritize: [ :it | it value = next value ifTrue: [ it score: priority ] ].
+                    ].
+                    entry value: newCost.
+                    cameFrom at: next value put: current value.
+                ].
+            ].
+        ].
+
+        ^ nil.
+    )
+)
