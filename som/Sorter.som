@@ -1,5 +1,5 @@
 
-" implementations of sorting algorithms "
+" Implementations of various sorting algorithms "
 Sorter = (
     ---------
 
