@@ -63,7 +63,7 @@ Day14 = (
             ].
         ].
     )
-    
+
     score: output = (
         | line counts min max entry |
 
@@ -115,11 +115,11 @@ Day14 = (
 
     part2 = (
         | answer fst snd |
-        
+
         fst := MyHashMap new.
         initial do: [ :entry | fst at: entry key put: entry value ].
         snd := MyHashMap new.
-        
+
         40 timesRepeat: [
             self replace: fst into: snd.
             answer := fst.
@@ -127,7 +127,7 @@ Day14 = (
             snd := answer.
             snd clear.
         ].
-        
+
         answer := self score: fst.
 
         'part2: ' print. answer println.

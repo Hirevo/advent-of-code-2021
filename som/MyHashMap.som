@@ -197,10 +197,10 @@ MyHashMap = (
 
     " TODO: implement `MyHashMap>>#retain:` "
     " TODO: implement `MyHashMap>>#shrinkToFit:` "
-    
+
     " TODO: implement `MyHashMap>>#print` "
     " TODO: implement `MyHashMap>>#println` "
-    
+
     " TODO: implement `MyHashMap>>#asString` "
 
     " private "
