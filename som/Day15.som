@@ -49,24 +49,30 @@ Day15 = (
 
         source := Point fromX: 0 andY: 0.
         destination := Point fromX: width - 1 andY: height - 1.
+
         neighbours := [ :point |
             | neighbours risk |
             neighbours := Vector new: 4.
+
             self coordsAround: point getX and: point getY in: width and: height do: [ :x :y |
                 point := Point fromX: x andY: y.
                 risk := (input at: y + 1) at: x + 1.
                 risk := RevRankedValue new: point score: risk.
                 neighbours append: risk.
             ].
+
             neighbours
         ].
+
         goal := [ :point | point = destination ].
         heuristic := [ :point | (destination getX - point getX) + (destination getY - point getY) ].
 
         answer := PathFinder dijkstra: source through: neighbours towards: goal.
         " answer := PathFinder astar: source through: neighbours towards: goal heuristic: heuristic. "
 
-        answer := answer inject: 0 into: [ :acc :point | acc + ((input at: point getY + 1) at: point getX + 1) ].
+        answer := answer inject: 0 into: [ :acc :point |
+            acc + ((input at: point getY + 1) at: point getX + 1)
+        ].
         answer := answer - ((input at: 1) at: 1).
 
         'part1: ' print. answer println.
@@ -80,9 +86,11 @@ Day15 = (
 
         source := Point fromX: 0 andY: 0.
         destination := Point fromX: newWidth - 1 andY: newHeight - 1.
+
         neighbours := [ :point |
             | neighbours risk |
             neighbours := Vector new: 4.
+
             self coordsAround: point getX and: point getY in: newWidth and: newHeight do: [ :x :y |
                 point := Point fromX: x andY: y.
                 risk := (input at: y % height + 1) at: x % width + 1.
@@ -90,8 +98,10 @@ Day15 = (
                 risk := RevRankedValue new: point score: risk.
                 neighbours append: risk.
             ].
+
             neighbours
         ].
+
         goal := [ :point | point = destination ].
         heuristic := [ :point | (destination getX - point getX) + (destination getY - point getY) ].
 
