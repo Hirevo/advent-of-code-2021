@@ -1,0 +1,115 @@
+
+Day16 = (
+    | packet |
+
+    setup = (
+        | input bitfield |
+
+        input := system loadFile: 'inputs/day16.txt'.
+        input isNil ifTrue: [ self error: 'could not open input file' ].
+
+        bitfield := Vector new: input length * 4.
+        1 to: input length do: [ :it |
+            it := self parseFromHex: (input charAt: it).
+            it ifNotNil: [ self toBinary: it in: bitfield ].
+        ].
+
+        packet := self parsePacket: bitfield.
+    )
+
+    toBinary: number in: bitfield = (
+        #(8 4 2 1) do: [ :factor |
+            number - factor >= 0 ifTrue: [
+                number := number - factor.
+                bitfield append: 1.
+            ] ifFalse: [
+                bitfield append: 0.
+            ].
+        ].
+    )
+
+    parseFromHex: digit = (
+        | digits output |
+        digits := #('0' '1' '2' '3' '4' '5' '6' '7' '8' '9' 'A' 'B' 'C' 'D' 'E' 'F').
+
+        output := ArrayUtils findIndex: [ :it | it = digit ] in: digits.
+        output ifNil: [ ^ nil ].
+
+        ^ output - 1.
+    )
+
+    parseLiteral: bits = (
+        | value stop |
+        value := 0.
+        stop := false.
+        [ stop ] whileFalse: [
+            stop := bits removeFirst = 0.
+            4 timesRepeat: [ value := value << 1 + bits removeFirst ].
+        ].
+        ^ value.
+    )
+
+    parseInteger: bits size: n = (
+        | value |
+        value := 0.
+        n timesRepeat: [ value := value << 1 + bits removeFirst ].
+        ^ value.
+    )
+
+    parsePacket: bits = (
+        | packet lengthTypeId |
+
+        packet := Day16Packet new.
+
+        packet version: (self parseInteger: bits size: 3).
+        packet typeId: (self parseInteger: bits size: 3).
+
+        packet typeId = 4 ifTrue: [
+            packet payload: (self parseLiteral: bits).
+            ^ packet.
+        ].
+
+        lengthTypeId := self parseInteger: bits size: 1.
+
+        lengthTypeId = 0 ifTrue: [
+            | subpackets length start |
+            length := self parseInteger: bits size: 15.
+
+            start := bits size.
+            subpackets := Vector new.
+            [ start - bits size < length ] whileTrue: [
+                subpackets append: (self parsePacket: bits).
+            ].
+
+            packet payload: subpackets asArray.
+        ].
+
+        lengthTypeId = 1 ifTrue: [
+            | subpackets length |
+            length := self parseInteger: bits size: 11.
+
+            subpackets := Vector new: length.
+            length timesRepeat: [
+                subpackets append: (self parsePacket: bits).
+            ].
+
+            packet payload: subpackets asArray.
+        ].
+
+        ^ packet.
+    )
+
+    part1 = (
+        'part1: ' print. packet sumVersions println.
+    )
+
+    part2 = (
+        'part2: ' print. packet evaluate println.
+    )
+
+    run: args = (
+        self setup.
+        Timing measure: [ self part1 ].
+        Timing measure: [ self part2 ].
+    )
+)

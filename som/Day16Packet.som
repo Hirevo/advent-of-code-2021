@@ -1,0 +1,74 @@
+
+" Represents a packet for the Day16 solution "
+Day16Packet = (
+    | version typeId payload |
+
+    version = ( ^ version )
+    typeId = ( ^ typeId )
+    payload = ( ^ payload )
+
+    version: newVersion = ( version := newVersion )
+    typeId: newTypeId = ( typeId := newTypeId )
+    payload: newPayload = ( payload := newPayload )
+
+    asString = ( ^ 'Packet ( version: ' + version + ', typeId: ' + typeId + ' )' )
+    print = ( system printString: self asString )
+    println = ( system printString: self asString + '\n' )
+
+    sumVersions = (
+        | subpackets |
+
+        self payload class = Array ifTrue: [
+            ^ self payload inject: self version into: [ :acc :it | acc + it sumVersions ].
+        ].
+
+        ^ self version.
+    )
+
+    evaluate = (
+        self typeId = 4 ifTrue: [ ^ self payload ].
+
+        self typeId = 0 ifTrue: [
+            ^ self payload inject: 0 into: [ :acc :it | acc + it evaluate ].
+        ].
+
+        self typeId = 1 ifTrue: [
+            ^ self payload inject: 1 into: [ :acc :it | acc * it evaluate ].
+        ].
+
+        self typeId = 2 ifTrue: [
+            ^ self payload inject: nil into: [ :acc :it |
+                it := it evaluate.
+                acc ifNil: it ifNotNil: [ acc min: it ].
+            ].
+        ].
+
+        self typeId = 3 ifTrue: [
+            ^ self payload inject: nil into: [ :acc :it |
+                it := it evaluate.
+                acc ifNil: it ifNotNil: [ acc max: it ].
+            ].
+        ].
+
+        self typeId = 5 ifTrue: [
+            | lhs rhs |
+            lhs := (self payload at: 1) evaluate.
+            rhs := (self payload at: 2) evaluate.
+            ^ lhs > rhs ifTrue: 1 ifFalse: 0.
+        ].
+
+        self typeId = 6 ifTrue: [
+            | lhs rhs |
+            lhs := (self payload at: 1) evaluate.
+            rhs := (self payload at: 2) evaluate.
+            ^ lhs < rhs ifTrue: 1 ifFalse: 0.
+        ].
+
+        self typeId = 7 ifTrue: [
+            | lhs rhs |
+            lhs := (self payload at: 1) evaluate.
+            rhs := (self payload at: 2) evaluate.
+            ^ lhs = rhs ifTrue: 1 ifFalse: 0.
+        ].
+    )
+)
