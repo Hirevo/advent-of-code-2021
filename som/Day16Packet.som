@@ -18,56 +18,56 @@ Day16Packet = (
     sumVersions = (
         | subpackets |
 
-        self payload class = Array ifTrue: [
-            ^ self payload inject: self version into: [ :acc :it | acc + it sumVersions ].
+        payload class = Array ifTrue: [
+            ^ payload inject: version into: [ :acc :it | acc + it sumVersions ].
         ].
 
-        ^ self version.
+        ^ version.
     )
 
     evaluate = (
-        self typeId = 4 ifTrue: [ ^ self payload ].
+        typeId = 4 ifTrue: [ ^ payload ].
 
-        self typeId = 0 ifTrue: [
-            ^ self payload inject: 0 into: [ :acc :it | acc + it evaluate ].
+        typeId = 0 ifTrue: [
+            ^ payload inject: 0 into: [ :acc :it | acc + it evaluate ].
         ].
 
-        self typeId = 1 ifTrue: [
-            ^ self payload inject: 1 into: [ :acc :it | acc * it evaluate ].
+        typeId = 1 ifTrue: [
+            ^ payload inject: 1 into: [ :acc :it | acc * it evaluate ].
         ].
 
-        self typeId = 2 ifTrue: [
-            ^ self payload inject: nil into: [ :acc :it |
+        typeId = 2 ifTrue: [
+            ^ payload inject: nil into: [ :acc :it |
                 it := it evaluate.
                 acc ifNil: it ifNotNil: [ acc min: it ].
             ].
         ].
 
-        self typeId = 3 ifTrue: [
-            ^ self payload inject: nil into: [ :acc :it |
+        typeId = 3 ifTrue: [
+            ^ payload inject: nil into: [ :acc :it |
                 it := it evaluate.
                 acc ifNil: it ifNotNil: [ acc max: it ].
             ].
         ].
 
-        self typeId = 5 ifTrue: [
+        typeId = 5 ifTrue: [
             | lhs rhs |
-            lhs := (self payload at: 1) evaluate.
-            rhs := (self payload at: 2) evaluate.
+            lhs := (payload at: 1) evaluate.
+            rhs := (payload at: 2) evaluate.
             ^ lhs > rhs ifTrue: 1 ifFalse: 0.
         ].
 
-        self typeId = 6 ifTrue: [
+        typeId = 6 ifTrue: [
             | lhs rhs |
-            lhs := (self payload at: 1) evaluate.
-            rhs := (self payload at: 2) evaluate.
+            lhs := (payload at: 1) evaluate.
+            rhs := (payload at: 2) evaluate.
             ^ lhs < rhs ifTrue: 1 ifFalse: 0.
         ].
 
-        self typeId = 7 ifTrue: [
+        typeId = 7 ifTrue: [
             | lhs rhs |
-            lhs := (self payload at: 1) evaluate.
-            rhs := (self payload at: 2) evaluate.
+            lhs := (payload at: 1) evaluate.
+            rhs := (payload at: 2) evaluate.
             ^ lhs = rhs ifTrue: 1 ifFalse: 0.
         ].
     )
