@@ -14,8 +14,8 @@ fn part1(_: i64, _: i64, min_y: i64, _: i64) -> Result<(), Error> {
 fn part2(min_x: i64, max_x: i64, min_y: i64, max_y: i64) -> Result<(), Error> {
     let mut answer = 0;
 
-    for dy in -300..300 {
-        for dx in -300..300 {
+    for dy in (-min_y.abs())..=min_y.abs() {
+        for dx in 0..=max_x {
             if ends_on_target(min_x, max_x, min_y, max_y, dx, dy) {
                 answer += 1;
             }

@@ -65,8 +65,9 @@ Day17 = (
         answer := 0.
 
         " very dirty bruteforce going on here "
-        -200 to: 200 do: [ :dy |
-            -200 to: 200 do: [ :dx |
+        " (but now with smarter bounds, so it must be okay, right ??) "
+        minY abs negated to: minY abs do: [ :dy |
+            0 to: maxX do: [ :dx |
                 (self endsInTarget: dx and: dy) ifTrue: [
                     answer := answer + 1.
                 ].
