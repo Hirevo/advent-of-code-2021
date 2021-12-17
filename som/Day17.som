@@ -1,0 +1,87 @@
+
+Day17 = (
+    | minX minY maxX maxY |
+
+    setup = (
+        | input hasTrailingNewline |
+
+        input := system loadFile: 'inputs/day17.txt'.
+        input isNil ifTrue: [ self error: 'could not open input file' ].
+
+        hasTrailingNewline := input endsWith: '\n'.
+        hasTrailingNewline := hasTrailingNewline ifTrue: 1 ifFalse: 0.
+
+        input := input substringFrom: 14 to: input length - hasTrailingNewline.
+        input := input split: ', '.
+        input := input collect: [ :part |
+            part := part substringFrom: 3 to: part length.
+            part := part split: '..'.
+            part collect: [ :part | part asInteger ]
+        ].
+
+        minX := (input at: 1) at: 1.
+        maxX := (input at: 1) at: 2.
+        minY := (input at: 2) at: 1.
+        maxY := (input at: 2) at: 2.
+
+        system printString: '(' + minX + '..' + maxX + ')\n'.
+        system printString: '(' + minY + '..' + maxY + ')\n'.
+    )
+
+    endsInTarget: dx and: dy = (
+        | x y |
+
+        x := 0.
+        y := 0.
+
+        [ (x between: minX - 1 and: maxX + 1) and: [ y between: minY - 1 and: maxY + 1 ] ] whileFalse: [
+            x := x + dx.
+            y := y + dy.
+
+            (x < minX and: dx < 0) ifTrue: [ ^ false ].
+            (x > maxX and: dx > 0) ifTrue: [ ^ false ].
+            (y < minY and: dy < 0) ifTrue: [ ^ false ].
+
+            dx <> 0 ifTrue: [
+                dx < 0 ifTrue: [
+                    dx := dx + 1.
+                ] ifFalse: [
+                    dx := dx - 1.
+                ].
+            ].
+
+            dy := dy - 1.
+        ].
+
+        ^ true.
+    )
+
+    part1 = (
+        | answer |
+        answer := minY abs * (minY abs - 1) / 2.
+        'part1: ' print. answer println.
+    )
+
+    part2 = (
+        | answer |
+
+        answer := 0.
+
+        " very dirty bruteforce going on here "
+        -200 to: 200 do: [ :dy |
+            -200 to: 200 do: [ :dx |
+                (self endsInTarget: dx and: dy) ifTrue: [
+                    answer := answer + 1.
+                ].
+            ].
+        ].
+
+        'part2: ' print. answer println.
+    )
+
+    run: args = (
+        self setup.
+        Timing measure: [ self part1 ].
+        Timing measure: [ self part2 ].
+    )
+)
