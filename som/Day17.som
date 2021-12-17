@@ -23,9 +23,6 @@ Day17 = (
         maxX := (input at: 1) at: 2.
         minY := (input at: 2) at: 1.
         maxY := (input at: 2) at: 2.
-
-        system printString: '(' + minX + '..' + maxX + ')\n'.
-        system printString: '(' + minY + '..' + maxY + ')\n'.
     )
 
     endsInTarget: dx and: dy = (
