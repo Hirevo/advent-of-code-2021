@@ -1,8 +1,8 @@
 use std::collections::VecDeque;
 use std::fs;
 
-use crate::Error;
 use crate::measured;
+use crate::Error;
 
 pub const INPUT_PATH: &str = "inputs/day16.txt";
 
