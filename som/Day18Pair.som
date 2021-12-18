@@ -1,0 +1,189 @@
+
+Day18Pair = (
+    | left right value |
+
+    left = ( ^ left )
+    right = ( ^ right )
+
+    left: newLeft = ( left := newLeft )
+    right: newRight = ( right := newRight )
+
+    asString = ( ^ '[' + left + ',' + right + ']' )
+    print = ( system printString: self asString )
+    println = ( system printString: self asString + '\n' )
+
+    clone = (
+        | clone |
+        clone := Day18Pair new.
+        left class = Day18Pair ifTrue: [
+            clone left: left clone.
+        ].
+        left class = Integer ifTrue: [
+            clone left: left.
+        ].
+        right class = Day18Pair ifTrue: [
+            clone right: right clone.
+        ].
+        right class = Integer ifTrue: [
+            clone right: right.
+        ].
+        ^ clone.
+    )
+
+    + other = (
+        | result |
+        result := Day18Pair new.
+        result left: self.
+        result right: other.
+        ^ result reduce.
+    )
+
+    magnitude = (
+        | value |
+        value := 0.
+
+        left class = Integer ifTrue: [
+            value := value + (3 * left).
+        ].
+
+        left class = Day18Pair ifTrue: [
+            value := value + (3 * left magnitude).
+        ].
+
+        right class = Integer ifTrue: [
+            value := value + (2 * right).
+        ].
+
+        right class = Day18Pair ifTrue: [
+            value := value + (2 * right magnitude).
+        ].
+
+        ^ value.
+    )
+
+    reduce = (
+        | stop |
+        stop := false.
+        [ stop ] whileFalse: [
+            stop := self reduceImpl = nil.
+        ].
+    )
+
+    reduceImpl = (
+        | result |
+        result := self explodeImpl: 0.
+        ^ result ifNil: [ self splitImpl ] ifNotNil: result.
+    )
+
+    explodeImpl: depth = (
+        | result |
+
+        left class = Day18Pair ifTrue: [
+            result := left explodeImpl: depth + 1.
+        ].
+
+        result class = Day18Pair ifTrue: [
+            result = left ifTrue: [ left := 0 ].
+
+            result right ifNotNil: [
+                right class = Integer ifTrue: [
+                    right := right + result right.
+                    result right: nil.
+                ].
+                right class = Day18Pair ifTrue: [
+                    (right addToLeftMost: result right) ifTrue: [
+                        result right: nil.
+                    ].
+                ].
+            ].
+
+            ^ result.
+        ].
+
+        (depth >= 4 and: [ right class = Integer ]) ifTrue: [
+            ^ self
+        ].
+
+        right class = Day18Pair ifTrue: [
+            result := right explodeImpl: depth + 1
+        ].
+
+        result class = Day18Pair ifTrue: [
+            result = right ifTrue: [ right := 0 ].
+
+            result left ifNotNil: [
+                left class = Integer ifTrue: [
+                    left := left + result left.
+                    result left: nil.
+                ].
+                left class = Day18Pair ifTrue: [
+                    (left addToRightMost: result left) ifTrue: [
+                        result left: nil.
+                    ].
+                ].
+            ].
+
+            ^ result.
+        ].
+
+        ^ nil.
+    )
+
+    splitImpl = (
+        | result |
+
+        left class = Day18Pair ifTrue: [
+            left splitImpl = #splitted ifTrue: [ ^ #splitted ].
+        ].
+
+        left class = Integer ifTrue: [
+            left > 9 ifTrue: [
+                | pair |
+                pair := Day18Pair new.
+                pair left: left / 2.
+                pair right: (left / 2) + (left % 2).
+                left := pair.
+                ^ #splitted.
+            ].
+        ].
+
+        right class = Day18Pair ifTrue: [
+            right splitImpl = #splitted ifTrue: [ ^ #splitted ].
+        ].
+
+        right class = Integer ifTrue: [
+            right > 9 ifTrue: [
+                | pair |
+                pair := Day18Pair new.
+                pair left: right / 2.
+                pair right: (right / 2) + (right % 2).
+                right := pair.
+                ^ #splitted.
+            ].
+        ].
+
+        ^ nil.
+    )
+
+    addToLeftMost: value = (
+        left class = Integer ifTrue: [
+            left := left + value.
+            ^ true.
+        ].
+        left class = Day18Pair ifTrue: [
+            ^ left addToLeftMost: value.
+        ].
+        ^ false.
+    )
+
+    addToRightMost: value = (
+        right class = Integer ifTrue: [
+            right := right + value.
+            ^ true.
+        ].
+        right class = Day18Pair ifTrue: [
+            ^ right addToRightMost: value.
+        ].
+        ^ false.
+    )
+)

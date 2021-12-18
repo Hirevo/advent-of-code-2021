@@ -1,0 +1,89 @@
+
+Day18 = (
+    | input |
+
+    setup = (
+        input := system loadFile: 'inputs/day18.txt'.
+        input isNil ifTrue: [ self error: 'could not open input file' ].
+
+        input := input split: '\n'.
+        input := input reject: [ :line | line length = 0 ].
+        input := input asArray.
+        
+        input := input collect: [ :line | (self parseNumber: line) at: 1 ].
+    )
+
+    parseNumber: string = (
+        | value result |
+
+        (string charAt: 1) = '[' ifTrue: [
+            | pair |
+            pair := Day18Pair new.
+
+            result := self parseNumber: (string substringFrom: 2 to: string length).
+            pair left: (result at: 1).
+            string := result at: 2.
+
+            result := self parseNumber: (string substringFrom: 2 to: string length).
+            pair right: (result at: 1).
+            string := result at: 2.
+
+            string := string substringFrom: (2 min: string length) to: string length.
+            ^ Array with: pair with: string.
+        ].
+
+        result := self numberLength: string.
+        value := (string substringFrom: 1 to: result) asInteger.
+
+        result := result + 1 min: string length.
+        string := string substringFrom: result to: string length.
+
+        ^ Array with: value with: string.
+    )
+
+    numberLength: string = (
+        | ch length |
+        length := 0.
+        ch := string charAt: 1.
+        [ ch isDigits ] whileTrue: [
+            length := length + 1.
+            ch := string charAt: 1 + length.
+        ].
+        ^ length.
+    )
+    
+    forEachPair: input do: block = (
+        input doIndexes: [ :i1 |
+            input doIndexes: [ :i2 |
+                i1 <> i2 ifTrue: [
+                    block value: (input at: i1) clone with: (input at: i2) clone.
+                ].
+            ].
+        ].
+    )
+
+    part1 = (
+        | answer stop |
+
+        answer := input inject: nil into: [ :acc :it |
+            acc = nil ifTrue: [ it clone ] ifFalse: [ acc + it clone ]
+        ].
+
+        'part1: ' print. answer magnitude println.
+    )
+
+    part2 = (
+        | answer |
+
+        answer := 0.
+        self forEachPair: input do: [ :n1 :n2 | answer := answer max: (n1 + n2) magnitude ].
+
+        'part2: ' print. answer println.
+    )
+
+    run: args = (
+        self setup.
+        Timing measure: [ self part1 ].
+        Timing measure: [ self part2 ].
+    )
+)
