@@ -4,6 +4,12 @@ Advent of Code 2021
 These are my solutions for the 2021 edition of the [**Advent of Code**](https://adventofcode.com).  
 The solutions are all implemented using both [**Rust**](https://rust-lang.org) and [**SOM (Simple Object Machine)**](https://som-st.github.io).  
 
+#### Day 19 Update
+
+I found Day 19 has been significantly harder than previous days, and it has ended my run of solving each puzzle on the same day of its release.  
+And since Christmas is around the corner, I'll be solving these and the rest of the puzzles at a later time.  
+I may also revisit some of the old solutions to improve their performance (mostly for the SOM ones, since the Rust ones are already plenty fast).  
+
 How to run
 ----------
 
