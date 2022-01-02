@@ -1,0 +1,151 @@
+
+Day20 = (
+    | pattern image |
+
+    setup = (
+        | input |
+
+        input := system loadFile: 'inputs/day20.txt'.
+        input isNil ifTrue: [ self error: 'could not open input file' ].
+
+        input := input split: '\n\n'.
+        input := input reject: [ :line | line length = 0 ].
+        input := input asArray.
+
+        pattern := input at: 1.
+        image := input at: 2.
+
+        image := image split: '\n'.
+        image := image reject: [ :line | line length = 0 ].
+        image := image asArray.
+
+        input := image.
+        image := Vector new.
+
+        input doIndexes: [ :y |
+            | row |
+            row := input at: y.
+            1 to: row length do: [ :x |
+                (row charAt: x) = '#' ifTrue: [
+                    image append: (Point fromX: x - 1 andY: y - 1).
+                ].
+            ].
+        ].
+
+        image := image asArray.
+    )
+
+    adjacents: point do: blk = (
+        " top row "
+        blk value: (Point fromX: point getX - 1 andY: point getY - 1).
+        blk value: (Point fromX: point getX andY: point getY - 1).
+        blk value: (Point fromX: point getX + 1 andY: point getY - 1).
+
+        " middle row "
+        blk value: (Point fromX: point getX - 1 andY: point getY).
+        blk value: (Point fromX: point getX andY: point getY).
+        blk value: (Point fromX: point getX + 1 andY: point getY).
+
+        " bottom row "
+        blk value: (Point fromX: point getX - 1 andY: point getY + 1).
+        blk value: (Point fromX: point getX andY: point getY + 1).
+        blk value: (Point fromX: point getX + 1 andY: point getY + 1).
+    )
+
+    step: image into: output outer: outer = (
+        | points minX maxX minY maxY bounds |
+
+        points := image keys.
+
+        minX := (points inject: nil into: [ :acc :it | acc ifNil: it getX ifNotNil: [ acc min: it getX ] ]) - 1.
+        maxX := (points inject: nil into: [ :acc :it | acc ifNil: it getX ifNotNil: [ acc max: it getX ] ]) + 1.
+
+        minY := (points inject: nil into: [ :acc :it | acc ifNil: it getY ifNotNil: [ acc min: it getY ] ]) - 1.
+        maxY := (points inject: nil into: [ :acc :it | acc ifNil: it getY ifNotNil: [ acc max: it getY ] ]) + 1.
+
+        minY to: maxY do: [ :y |
+            minX to: maxX do: [ :x |
+                | point index |
+                index := 0.
+
+                point := Point fromX: x andY: y.
+                self adjacents: point do: [ :adjPoint |
+                    | inBounds bit |
+
+                    inBounds := adjPoint getX between: minX and: maxX.
+                    inBounds := inBounds and: [ adjPoint getY between: minY and: maxY ].
+
+                    inBounds ifTrue: [
+                        bit := (image containsKey: adjPoint) ifTrue: 1 ifFalse: 0.
+                    ] ifFalse: [
+                        bit := outer.
+                    ].
+
+                    index := index << 1 + bit.
+                ].
+
+                (pattern charAt: index + 1) = '#' ifTrue: [
+                    output at: point put: true.
+                ].
+            ].
+        ].
+    )
+
+    part1 = (
+        | answer fst snd outer |
+
+        fst := MyHashMap new: 100000.
+        snd := MyHashMap new: 100000.
+
+        image do: [ :point | fst at: point put: true ].
+
+        outer := 0.
+
+        2 timesRepeat: [
+            self step: fst into: snd outer: outer.
+            outer := outer + 1 % 2.
+
+            answer := fst.
+            fst := snd.
+            snd := answer.
+
+            snd clear.
+        ].
+
+        answer := fst size.
+
+        'part1: ' print. answer println.
+    )
+
+    part2 = (
+        | answer fst snd outer |
+
+        fst := MyHashMap new: 100000.
+        snd := MyHashMap new: 100000.
+
+        image do: [ :point | fst at: point put: true ].
+
+        outer := 0.
+
+        50 timesRepeat: [
+            self step: fst into: snd outer: outer.
+            outer := outer + 1 % 2.
+
+            answer := fst.
+            fst := snd.
+            snd := answer.
+
+            snd clear.
+        ].
+
+        answer := fst size.
+
+        'part2: ' print. answer println.
+    )
+
+    run: args = (
+        self setup.
+        Timing measure: [ self part1 ].
+        Timing measure: [ self part2 ].
+    )
+)
