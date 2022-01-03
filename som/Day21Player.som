@@ -1,0 +1,38 @@
+
+Day21Player = (
+    | position score |
+
+    score = ( ^ score )
+    position = ( ^ position )
+
+    = other = (
+        ^ position = other position
+            and: score = other score
+    )
+    
+    == other = (
+        ^ self = other.
+    )
+    
+    hashcode = (
+        ^ 524287 * position hashcode + score hashcode.
+    )
+
+    move: amount = (
+        | newPosition newScore |
+        newPosition := position + amount - 1 % 10 + 1.
+        newScore := score + newPosition.
+        ^ self class new: newPosition score: newScore.
+    )
+
+    initialize: newPosition score: newScore = (
+        position := newPosition.
+        score := newScore.
+    )
+
+    -----------
+
+    new: position score: score = (
+        ^ self new initialize: position score: score.
+    )
+)

@@ -1,0 +1,112 @@
+
+Day21 = (
+    | p1 p2 cache |
+
+    setup = (
+        | input |
+
+        input := system loadFile: 'inputs/day21.txt'.
+        input isNil ifTrue: [ self error: 'could not open input file' ].
+
+        input := input split: '\n'.
+        input := input reject: [ :line | line length = 0 ].
+        input := input asArray.
+
+        p1 := (((input at: 1) split: ' ') at: 5) asInteger.
+        p2 := (((input at: 2) split: ' ') at: 5) asInteger.
+        
+        cache := MyHashMap new: 100000.
+    )
+
+    " This solution is basically a simple divide-and-conquer (recursive) solution. "
+    " But we add memoization to drastically accelerate it since similar states are "
+    " very likely to appear across multiple universes. "
+    " PS: we take turns into account by simply inverting the players before our recursive call. "
+    diracDice: state = (
+        | entry scores wins |
+
+        entry := cache entry: state.
+        entry value ifNotNil: [ ^ entry value ].
+
+        " A throw of 3 3-sided dice are guaranteed to give a score between 3 and 9. "
+        " This table records how many of all 27 (3^3) possible throws give a given score. "
+        scores := #(
+            #(3 1)
+            #(4 3)
+            #(5 6)
+            #(6 7)
+            #(7 6)
+            #(8 3)
+            #(9 1)
+        ).
+
+        wins := #(0 0).
+        scores do: [ :score |
+            | newP1 |
+            newP1 := state p1 move: (score at: 1).
+
+            newP1 score >= 21 ifTrue: [
+                wins at: 1 put: (score at: 2) + (wins at: 1).
+            ] ifFalse: [
+                | result |
+                result := self diracDice: (Day21State new: state p2 and: newP1).
+                wins at: 1 put: (result at: 2) * (score at: 2) + (wins at: 1).
+                wins at: 2 put: (result at: 1) * (score at: 2) + (wins at: 2).
+            ].
+        ].
+
+        entry value: wins.
+        ^ wins.
+    )
+
+    part1 = (
+        | answer t1 t2 rollCount |
+
+        t1 := Day21Player new: p1 score: 0.
+        t2 := Day21Player new: p2 score: 0.
+
+        rollCount := 0.
+
+        [ answer isNil ] whileTrue: [
+            | roll temp |
+
+            roll := rollCount % 100 + 1.
+            rollCount := rollCount + 1.
+            roll := roll + (rollCount % 100 + 1).
+            rollCount := rollCount + 1.
+            roll := roll + (rollCount % 100 + 1).
+            rollCount := rollCount + 1.
+
+            temp := t2.
+            t2 := t1 move: roll.
+            t1 := temp.
+
+            t2 score >= 1000 ifTrue: [
+                answer := t1 score * rollCount.
+            ].
+        ].
+
+        'part1: ' print. answer println.
+    )
+
+    part2 = (
+        | answer t1 t2 state |
+
+        t1 := Day21Player new: p1 score: 0.
+        t2 := Day21Player new: p2 score: 0.
+
+        state := Day21State new: t1 and: t2.
+
+        answer := self diracDice: state.
+
+        answer := (answer at: 1) max: (answer at: 2).
+
+        'part2: ' print. answer println.
+    )
+
+    run: args = (
+        self setup.
+        Timing measure: [ self part1 ].
+        Timing measure: [ self part2 ].
+    )
+)

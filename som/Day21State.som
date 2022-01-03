@@ -1,0 +1,30 @@
+
+Day21State = (
+    | p1 p2 |
+
+    p1 = ( ^ p1 )
+    p2 = ( ^ p2 )
+
+    = other = (
+        ^ p1 = other p1 and: p2 = other p2.
+    )
+
+    == other = (
+        ^ self = other.
+    )
+
+    hashcode = (
+        ^ 524287 * p1 hashcode + p2 hashcode.
+    )
+
+    initialize: newP1 and: newP2 = (
+        p1 := newP1.
+        p2 := newP2.
+    )
+
+    -----------
+
+    new: p1 and: p2 = (
+        ^ self new initialize: p1 and: p2.
+    )
+)

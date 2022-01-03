@@ -25,6 +25,7 @@ mod day17;
 mod day18;
 // mod day19;
 mod day20;
+mod day21;
 mod parser;
 mod timing;
 
@@ -62,6 +63,7 @@ fn main() -> Result<(), Error> {
         18 => day18::run(),
         // 19 => day19::run(),
         20 => day20::run(),
+        21 => day21::run(),
         n if (1..=24).contains(&n) => {
             println!("this day has not (yet) been solved !");
             Ok(())
