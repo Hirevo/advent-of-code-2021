@@ -9,11 +9,11 @@ Day21Player = (
         ^ position = other position
             and: score = other score
     )
-    
+
     == other = (
         ^ self = other.
     )
-    
+
     hashcode = (
         ^ 524287 * position hashcode + score hashcode.
     )

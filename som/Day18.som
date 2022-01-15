@@ -9,7 +9,7 @@ Day18 = (
         input := input split: '\n'.
         input := input reject: [ :line | line length = 0 ].
         input := input asArray.
-        
+
         input := input collect: [ :line | (self parseNumber: line) at: 1 ].
     )
 
@@ -51,7 +51,7 @@ Day18 = (
         ].
         ^ length.
     )
-    
+
     forEachPair: input do: block = (
         input doIndexes: [ :i1 |
             input doIndexes: [ :i2 |

@@ -14,7 +14,7 @@ Day21 = (
 
         p1 := (((input at: 1) split: ' ') at: 5) asInteger.
         p2 := (((input at: 2) split: ' ') at: 5) asInteger.
-        
+
         cache := MyHashMap new: 100000.
     )
 
