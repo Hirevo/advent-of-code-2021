@@ -1,0 +1,185 @@
+
+" An HashSet implementation (essentially an HashMap with only keys) "
+MyHashSet = (
+    | table capacity size |
+
+    size = ( ^ size )
+    capacity = ( ^ capacity )
+
+    loadFactor = ( ^ 0.75 )
+
+    " returns the key stored in the set that compares the same and hashes the same as the value "
+    at: value = (
+        | hash head |
+        hash := (key hashcode % capacity) abs + 1.
+        head := table at: hash.
+
+        head ifNil: [ ^ nil ].
+
+        [ head next notNil ] whileTrue: [
+            head key = key ifTrue: [ ^ head value ].
+            head := head next.
+        ].
+        head key = key ifTrue: [ ^ head value ].
+
+        ^ nil.
+    )
+
+    " inserts a key in the set and returns if the value is newly inserted or not "
+    insert: key = (
+        | hash head |
+        size >= (capacity * self loadFactor) ifTrue: [ self grow ].
+
+        hash := (key hashcode % capacity) abs + 1.
+        head := table at: hash.
+
+        head ifNil: [
+            table at: hash put: (MyEntry new: key and: true).
+            size := size + 1.
+            ^ true.
+        ].
+
+        [ head next notNil ] whileTrue: [
+            head key = key ifTrue: [ head key: key. ^ false ].
+            head := head next.
+        ].
+        head key = key ifTrue: [ head key: key. ^ false ].
+
+        head next: (MyEntry new: key and: true).
+        size := size + 1.
+
+        ^ true.
+    )
+
+    " removes the given key from the set "
+    remove: key = (
+        | hash head next |
+        hash := (key hashcode % capacity) abs + 1.
+        head := table at: hash.
+        head ifNil: [ ^ nil ].
+
+        head key = key ifTrue: [
+            table at: hash put: head next.
+            size := size - 1.
+            ^ head key.
+        ].
+        next := head next.
+
+        [ next notNil ] whileTrue: [
+            next key = key ifTrue: [
+                head next: next next.
+                size := size - 1.
+                ^ next key.
+            ].
+            head := next.
+            next := head next.
+        ].
+
+        ^ nil.
+    )
+
+    " returns whether the given key is stored within the set "
+    containsKey: key = (
+        | hash head |
+        hash := (key hashcode % capacity) abs + 1.
+        head := table at: hash.
+
+        head ifNil: [ ^ false ].
+
+        [ head next notNil ] whileTrue: [
+            head key = key ifTrue: [ ^ true ].
+            head := head next.
+        ].
+        head key = key ifTrue: [ ^ true ].
+
+        ^ false.
+    )
+
+    " returns all keys stored in the set, as an array "
+    keys = (
+        | output idx |
+        idx := 1.
+        output := Array new: size.
+
+        table do: [ :head |
+            [ head notNil ] whileTrue: [
+                output at: idx put: head key.
+                head := head next.
+                idx := idx + 1.
+            ].
+        ].
+
+        ^ output.
+    )
+
+    " clears the set, removing all entries, but keeping its current capacity "
+    clear = (
+        size := 0.
+        table putAll: nil.
+    )
+
+    " runs the given block on every key stored in the set "
+    do: blk = (
+        | head |
+        1 to: table length do: [ :idx |
+            head := table at: idx.
+            [ head notNil ] whileTrue: [
+                blk value: head key.
+                head := head next.
+            ].
+        ]
+    )
+
+    " TODO: implement `MyHashSet>>#retain:` "
+    " TODO: implement `MyHashSet>>#shrinkToFit:` "
+
+    " TODO: implement `MyHashSet>>#print` "
+    " TODO: implement `MyHashSet>>#println` "
+
+    " TODO: implement `MyHashSet>>#asString` "
+
+    " private "
+    grow = (
+        | newTable newCapacity |
+        newCapacity := capacity * 2.
+        newCapacity = 0 ifTrue: [ newCapacity := 16 ].
+        newTable := Array new: newCapacity.
+        table do: [ :entry |
+            [ entry notNil ] whileTrue: [
+                | hash head next |
+                hash := (entry key hashcode % newCapacity) abs + 1.
+                head := newTable at: hash.
+
+                head ifNil: [
+                    newTable at: hash put: entry.
+                ] ifNotNil: [
+                    [ head next notNil ] whileTrue: [ head := head next ].
+                    head next: entry.
+                ].
+
+                next := entry next.
+                entry next: nil.
+                entry := next.
+            ].
+        ].
+        table := newTable.
+        capacity := newCapacity.
+    )
+
+    " private "
+    initialize: newCapacity = (
+        table := Array new: newCapacity.
+        capacity := newCapacity.
+        size := 0.
+    )
+
+    --------------
+
+    new = ( ^ self new: 16 )
+    new: capacity = (
+        | set |
+        set := super new.
+        set initialize: capacity.
+        ^ set.
+    )
+)

@@ -1,0 +1,164 @@
+
+Day22 = (
+    | steps |
+
+    setup = (
+        | input |
+
+        input := system loadFile: 'inputs/day22.txt'.
+        input isNil ifTrue: [ self error: 'could not open input file' ].
+
+        input := input split: '\n'.
+        input := input reject: [ :line | line length = 0 ].
+        input := input asArray.
+
+        steps := input collect: [ :line |
+            | output parts cuboid |
+
+            line := line split: ' '.
+            parts := (line at: 2) split: ','.
+
+            output := Array new: 2.
+            output at: 1 put: (line at: 1) asSymbol.
+
+            cuboid := Day22Cuboid
+                lo: (Point3 x: 0 y: 0 z: 0)
+                hi: (Point3 x: 0 y: 0 z: 0).
+
+            parts doIndexes: [ :idx |
+                | part name |
+                part := (parts at: idx) split: '='.
+                name := (part at: 1) asSymbol.
+                part := (part at: 2) split: '..'.
+
+                name = #x ifTrue: [
+                    cuboid lo x: (part at: 1) asInteger.
+                    cuboid hi x: (part at: 2) asInteger + 1.
+                ].
+
+                name = #y ifTrue: [
+                    cuboid lo y: (part at: 1) asInteger.
+                    cuboid hi y: (part at: 2) asInteger + 1.
+                ].
+
+                name = #z ifTrue: [
+                    cuboid lo z: (part at: 1) asInteger.
+                    cuboid hi z: (part at: 2) asInteger + 1.
+                ].
+            ].
+
+            output at: 2 put: cuboid.
+        ].
+    )
+
+    part1 = (
+        | answer set |
+
+        " This is the bruteforce method. "
+        " We just have a set of every single 3D point that is currently on, and update it for each step. "
+
+        set := MyHashSet new: 1000000.
+
+        steps do: [ :step |
+            | op cuboid inBounds |
+
+            op := step at: 1.
+            cuboid := step at: 2.
+
+            " NOTE: our cuboid bounds are exclusive for the `hi` point, so we use 51 instead of 50 "
+            inBounds := (cuboid lo x >= -50) && (cuboid hi x <= 51)
+                && (cuboid lo y >= -50) && (cuboid hi y <= 51)
+                && (cuboid lo z >= -50) && (cuboid hi z <= 51).
+
+            inBounds ifTrue: [
+                cuboid lo x to: cuboid hi x - 1 do: [ :x |
+                    cuboid lo y to: cuboid hi y - 1 do: [ :y |
+                        cuboid lo z to: cuboid hi z - 1 do: [ :z |
+                            op = #on ifTrue: [
+                                set insert: (Point3 x: x y: y z: z).
+                            ].
+
+                            op = #off ifTrue: [
+                                set remove: (Point3 x: x y: y z: z).
+                            ].
+                        ].
+                    ].
+                ].
+            ].
+        ].
+
+        answer := set size.
+
+        'part1: ' print. answer println.
+    )
+
+    part2 = (
+        | answer cuboids |
+
+        " This is the smarter method. "
+        " We subdivide into smaller cuboids the volume of the difference between two cuboids after intersecting, "
+        " and we keep a list of the cuboids that are currently on (which keeps that list rather small). "
+        " (see the `Day22Cuboid` class to see how the subdivision happens) "
+
+        cuboids := Vector new.
+
+        steps do: [ :step |
+            | op cuboid |
+
+            op := step at: 1.
+            cuboid := step at: 2.
+
+            op = #on ifTrue: [
+                | fst snd |
+                fst := Vector new.
+                snd := Vector new.
+                fst append: cuboid.
+
+                cuboids do: [ :it1 |
+                    fst do: [ :it2 |
+                        | splitted |
+
+                        splitted := it2 split: it1.
+                        splitted ifNil: [
+                            snd append: it2.
+                        ] ifNotNil: [
+                            splitted do: [ :it | snd append: it ].
+                        ].
+                    ].
+
+                    fst := snd.
+                    snd := Vector new.
+                ].
+
+                fst do: [ :it | cuboids append: it ].
+            ].
+
+            op = #off ifTrue: [
+                | newCuboids |
+                newCuboids := Vector new: cuboids size.
+
+                cuboids do: [ :it |
+                    | splitted |
+                    splitted := it split: cuboid.
+                    splitted ifNil: [
+                        newCuboids append: it.
+                    ] ifNotNil: [
+                        splitted do: [ :it | newCuboids append: it ].
+                    ].
+                ].
+
+                cuboids := newCuboids.
+            ].
+        ].
+
+        answer := cuboids asArray inject: 0 into: [ :acc :it | acc + it volume ].
+
+        'part2: ' print. answer println.
+    )
+
+    run: args = (
+        self setup.
+        Timing measure: [ self part1 ].
+        Timing measure: [ self part2 ].
+    )
+)

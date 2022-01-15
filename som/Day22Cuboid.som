@@ -1,0 +1,401 @@
+
+Day22Cuboid = (
+    | lo hi |
+
+    lo = ( ^ lo )
+    hi = ( ^ hi )
+
+    lo: newLo = ( lo := newLo )
+    hi: newHi = ( hi := newHi )
+
+    = other = (
+        ^ lo = other lo and: hi = other hi.
+    )
+
+    == other = (
+        ^ self = other.
+    )
+
+    hashcode = (
+        ^ 524287 * lo hashcode + hi hashcode.
+    )
+
+    clone = (
+        ^ self class lo: lo clone hi: hi clone.
+    )
+
+    asString = (
+        ^ 'x=' + lo x + '..' + hi x + ',y=' + lo y + '..' + hi y + ',z=' + lo z + '..' + hi z
+    )
+
+    print = (
+        system printString: self asString.
+    )
+
+    println = (
+        system printString: self asString + '\n'.
+    )
+
+    isEmpty = (
+        ^ ((hi x > lo x) && (hi y > lo y) && (hi z > lo z)) not
+    )
+
+    volume = (
+        ^ (hi x - lo x) * (hi y - lo y) * (hi z - lo z).
+    )
+
+    intersection: other = (
+        | newLo newHi cuboid |
+
+        newLo := Point3
+            x: (lo x max: other lo x)
+            y: (lo y max: other lo y)
+            z: (lo z max: other lo z).
+
+        newHi := Point3
+            x: (hi x min: other hi x)
+            y: (hi y min: other hi y)
+            z: (hi z min: other hi z).
+
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+
+        cuboid isEmpty ifTrue: [ ^ nil ].
+
+        ^ cuboid.
+    )
+
+    split: other = (
+        | cuboids intersection newLo newHi cuboid |
+
+        intersection := self intersection: other.
+        intersection ifNil: [ ^ nil ].
+
+        intersection = self ifTrue: [ ^ #() ].
+
+        cuboids := Vector new.
+
+        " LEFT "
+        newLo := Point3
+            x: (lo x min: intersection lo x)
+            y: intersection lo y
+            z: intersection lo z.
+        newHi := Point3
+            x: intersection lo x
+            y: intersection hi y
+            z: intersection hi z.
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " RIGHT "
+        newLo := Point3
+            x: intersection hi x
+            y: intersection lo y
+            z: intersection lo z.
+        newHi := Point3
+            x: (hi x max: intersection hi x)
+            y: intersection hi y
+            z: intersection hi z.
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " TOP "
+        newLo := Point3
+            x: intersection lo x
+            y: (lo y min: intersection lo y)
+            z: intersection lo z.
+        newHi := Point3
+            x: intersection hi x
+            y: intersection lo y
+            z: intersection hi z.
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " BOTTOM "
+        newLo := Point3
+            x: intersection lo x
+            y: intersection hi y
+            z: intersection lo z.
+        newHi := Point3
+            x: intersection hi x
+            y: (hi y max: intersection hi y)
+            z: intersection hi z.
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " FRONT "
+        newLo := Point3
+            x: intersection lo x
+            y: intersection lo y
+            z: (lo z min: intersection lo z).
+        newHi := Point3
+            x: intersection hi x
+            y: intersection hi y
+            z: intersection lo z.
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " BACK "
+        newLo := Point3
+            x: intersection lo x
+            y: intersection lo y
+            z: intersection hi z.
+        newHi := Point3
+            x: intersection hi x
+            y: intersection hi y
+            z: (hi z max: intersection hi z).
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " TOP-LEFT "
+        newLo := Point3
+            x: (lo x min: intersection lo x)
+            y: (lo y min: intersection lo y)
+            z: intersection lo z.
+        newHi := Point3
+            x: intersection lo x
+            y: intersection lo y
+            z: intersection hi z.
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " TOP-RIGHT "
+        newLo := Point3
+            x: intersection hi x
+            y: (lo y min: intersection lo y)
+            z: intersection lo z.
+        newHi := Point3
+            x: (hi x max: intersection hi x)
+            y: intersection lo y
+            z: intersection hi z.
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " BOTTOM-LEFT "
+        newLo := Point3
+            x: (lo x min: intersection lo x)
+            y: intersection hi y
+            z: intersection lo z.
+        newHi := Point3
+            x: intersection lo x
+            y: (hi y max: intersection hi y)
+            z: intersection hi z.
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " BOTTOM-RIGHT "
+        newLo := Point3
+            x: intersection hi x
+            y: intersection hi y
+            z: intersection lo z.
+        newHi := Point3
+            x: (hi x max: intersection hi x)
+            y: (hi y max: intersection hi y)
+            z: intersection hi z.
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " FRONT-LEFT "
+        newLo := Point3
+            x: (lo x min: intersection lo x)
+            y: intersection lo y
+            z: (lo z min: intersection lo z).
+        newHi := Point3
+            x: intersection lo x
+            y: intersection hi y
+            z: intersection lo z.
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " FRONT-RIGHT "
+        newLo := Point3
+            x: intersection hi x
+            y: intersection lo y
+            z: (lo z min: intersection lo z).
+        newHi := Point3
+            x: (hi x max: intersection hi x)
+            y: intersection hi y
+            z: intersection lo z.
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " BACK-LEFT "
+        newLo := Point3
+            x: (lo x min: intersection lo x)
+            y: intersection lo y
+            z: intersection hi z.
+        newHi := Point3
+            x: intersection lo x
+            y: intersection hi y
+            z: (hi z max: intersection hi z).
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " BACK-RIGHT "
+        newLo := Point3
+            x: intersection hi x
+            y: intersection lo y
+            z: intersection hi z.
+        newHi := Point3
+            x: (hi x max: intersection hi x)
+            y: intersection hi y
+            z: (hi z max: intersection hi z).
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " TOP-FRONT "
+        newLo := Point3
+            x: intersection lo x
+            y: (lo y min: intersection lo y)
+            z: (lo z min: intersection lo z).
+        newHi := Point3
+            x: intersection hi x
+            y: intersection lo y
+            z: intersection lo z.
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " TOP-BACK "
+        newLo := Point3
+            x: intersection lo x
+            y: (lo y min: intersection lo y)
+            z: intersection hi z.
+        newHi := Point3
+            x: intersection hi x
+            y: intersection lo y
+            z: (hi z max: intersection hi z).
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " BOTTOM-FRONT "
+        newLo := Point3
+            x: intersection lo x
+            y: intersection hi y
+            z: (lo z min: intersection lo z).
+        newHi := Point3
+            x: intersection hi x
+            y: (hi y max: intersection hi y)
+            z: intersection lo z.
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " BOTTOM-BACK "
+        newLo := Point3
+            x: intersection lo x
+            y: intersection hi y
+            z: intersection hi z.
+        newHi := Point3
+            x: intersection hi x
+            y: (hi y max: intersection hi y)
+            z: (hi z max: intersection hi z).
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " TOP-LEFT-FRONT "
+        newLo := Point3
+            x: (lo x min: intersection lo x)
+            y: (lo y min: intersection lo y)
+            z: (lo z min: intersection lo z).
+        newHi := Point3
+            x: intersection lo x
+            y: intersection lo y
+            z: intersection lo z.
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " TOP-LEFT-BACK "
+        newLo := Point3
+            x: (lo x min: intersection lo x)
+            y: (lo y min: intersection lo y)
+            z: intersection hi z.
+        newHi := Point3
+            x: intersection lo x
+            y: intersection lo y
+            z: (hi z max: intersection hi z).
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " TOP-RIGHT-FRONT "
+        newLo := Point3
+            x: (lo x min: intersection lo x)
+            y: intersection hi y
+            z: (lo z min: intersection lo z).
+        newHi := Point3
+            x: intersection lo x
+            y: (hi y max: intersection hi y)
+            z: intersection lo z.
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " TOP-RIGHT-BACK "
+        newLo := Point3
+            x: (lo x min: intersection lo x)
+            y: intersection hi y
+            z: intersection hi z.
+        newHi := Point3
+            x: intersection lo x
+            y: (hi y max: intersection hi y)
+            z: (hi z max: intersection hi z).
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " BOTTOM-LEFT-FRONT "
+        newLo := Point3
+            x: intersection hi x
+            y: (lo y min: intersection lo y)
+            z: (lo z min: intersection lo z).
+        newHi := Point3
+            x: (hi x max: intersection hi x)
+            y: intersection lo y
+            z: intersection lo z.
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " BOTTOM-LEFT-BACK "
+        newLo := Point3
+            x: intersection hi x
+            y: (lo y min: intersection lo y)
+            z: intersection hi z.
+        newHi := Point3
+            x: (hi x max: intersection hi x)
+            y: intersection lo y
+            z: (hi z max: intersection hi z).
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " BOTTOM-RIGHT-FRONT "
+        newLo := Point3
+            x: intersection hi x
+            y: intersection hi y
+            z: (lo z min: intersection lo z).
+        newHi := Point3
+            x: (hi x max: intersection hi x)
+            y: (hi y max: intersection hi y)
+            z: intersection lo z.
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        " BOTTOM-RIGHT-BACK "
+        newLo := Point3
+            x: intersection hi x
+            y: intersection hi y
+            z: intersection hi z.
+        newHi := Point3
+            x: (hi x max: intersection hi x)
+            y: (hi y max: intersection hi y)
+            z: (hi z max: intersection hi z).
+        cuboid := Day22Cuboid lo: newLo hi: newHi.
+        cuboid isEmpty ifFalse: [ cuboids append: cuboid ].
+
+        ^ cuboids asArray.
+    )
+
+    -----------
+
+    lo: lo hi: hi = (
+        | point |
+        point := self new.
+        point lo: lo.
+        point hi: hi.
+        ^ point.
+    )
+)

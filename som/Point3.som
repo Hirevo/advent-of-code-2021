@@ -1,0 +1,54 @@
+
+Point3 = (
+    | x y z |
+
+    x = ( ^ x )
+    y = ( ^ y )
+    z = ( ^ z )
+
+    x: newX = ( x := newX )
+    y: newY = ( y := newY )
+    z: newZ = ( z := newZ )
+
+    = other = (
+        ^ (x = other x and: y = other y) and: z = other z.
+    )
+
+    == other = (
+        ^ self = other.
+    )
+
+    + other = (
+        x := x + other x.
+        y := y + other y.
+        z := z + other z.
+    )
+
+    hashcode = (
+        ^ 524287 * (524287 * x hashcode + y hashcode) + z hashcode.
+    )
+
+    clone = (
+        ^ self class x: x y: y z: z.
+    )
+
+    print = (
+        ('(' + x + ',' + y + ',' + z + ')') print.
+    )
+
+    println = (
+        self print.
+        '' println.
+    )
+
+    -----------
+
+    x: x y: y z: z = (
+        | point |
+        point := self new.
+        point x: x.
+        point y: y.
+        point z: z.
+        ^ point.
+    )
+)
