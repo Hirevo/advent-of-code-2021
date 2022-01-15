@@ -4,7 +4,7 @@ macro_rules! measured {
         let start = ::std::time::Instant::now();
         let value = $expr;
         let elapsed = start.elapsed();
-        println!(" -> solution ran in {:?}", elapsed);
+        println!(" -> solution ran in {elapsed:?}");
         value
     }};
 }

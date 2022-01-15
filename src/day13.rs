@@ -19,7 +19,7 @@ fn part1(dots: &HashSet<Point>, instrs: &[Instr]) -> Result<(), Error> {
     fold(&dots, &mut to, instrs[0]);
 
     let answer = to.len();
-    println!("part1: {}", answer);
+    println!("part1: {answer}");
     Ok(())
 }
 

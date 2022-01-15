@@ -28,7 +28,7 @@ fn part1(input: &[u64], width: usize, height: usize) -> Result<(), Error> {
 
     let (_, answer) = dijkstra::dijkstra(&source, successors, success).expect("found no paths");
 
-    println!("part1: {}", answer);
+    println!("part1: {answer}");
     Ok(())
 }
 
@@ -55,7 +55,7 @@ fn part2(input: &[u64], width: usize, height: usize) -> Result<(), Error> {
 
     let (_, answer) = dijkstra::dijkstra(&source, successors, success).expect("found no paths");
 
-    println!("part2: {}", answer);
+    println!("part2: {answer}");
     Ok(())
 }
 

@@ -21,7 +21,7 @@ fn part1(initial: &FrequencyMap, map: &InsertionMap) -> Result<(), Error> {
 
     let answer = compute_score(&fst);
 
-    println!("part1: {}", answer);
+    println!("part1: {answer}");
     Ok(())
 }
 
@@ -37,7 +37,7 @@ fn part2(initial: &FrequencyMap, map: &InsertionMap) -> Result<(), Error> {
 
     let answer = compute_score(&fst);
 
-    println!("part2: {}", answer);
+    println!("part2: {answer}");
     Ok(())
 }
 

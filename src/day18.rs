@@ -28,8 +28,8 @@ impl Add for Tree {
 impl fmt::Display for Tree {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Number(n) => write!(f, "{}", n),
-            Self::Pair(left, right) => write!(f, "[{},{}]", left, right),
+            Self::Number(number) => write!(f, "{number}"),
+            Self::Pair(left, right) => write!(f, "[{left},{right}]"),
         }
     }
 }
@@ -190,7 +190,7 @@ fn part2(numbers: &[Tree]) -> Result<(), Error> {
         }
     }
 
-    println!("part2: {}", answer);
+    println!("part2: {answer}");
     Ok(())
 }
 

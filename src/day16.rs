@@ -138,13 +138,13 @@ impl Packet {
 
 fn part1(packet: &Packet) -> Result<(), Error> {
     let answer = packet.sum_versions();
-    println!("part1: {}", answer);
+    println!("part1: {answer}");
     Ok(())
 }
 
 fn part2(packet: &Packet) -> Result<(), Error> {
     let answer = packet.evaluate();
-    println!("part2: {}", answer);
+    println!("part2: {answer}");
     Ok(())
 }
 

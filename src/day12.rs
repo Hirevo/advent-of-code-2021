@@ -10,7 +10,7 @@ fn part1(map: &HashMap<String, Vec<String>>) -> Result<(), Error> {
     let mut stack = vec!["start"];
     let answer = search_part_1(map, &mut stack);
 
-    println!("part1: {}", answer);
+    println!("part1: {answer}");
     Ok(())
 }
 
@@ -18,7 +18,7 @@ fn part2(map: &HashMap<String, Vec<String>>) -> Result<(), Error> {
     let mut stack = vec!["start"];
     let answer = search_part_2(map, &mut stack, false);
 
-    println!("part2: {}", answer);
+    println!("part2: {answer}");
     Ok(())
 }
 

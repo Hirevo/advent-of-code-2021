@@ -1,8 +1,8 @@
 use std::collections::HashSet;
 use std::fs;
 
-use crate::Error;
 use crate::measured;
+use crate::Error;
 
 pub const INPUT_PATH: &str = "inputs/day20.txt";
 
@@ -26,7 +26,7 @@ fn part1(pattern: &[char], image: &HashSet<(i64, i64)>) -> Result<(), Error> {
 
     let answer = fst.len();
 
-    println!("part1: {}", answer);
+    println!("part1: {answer}");
     Ok(())
 }
 
@@ -50,7 +50,7 @@ fn part2(pattern: &[char], image: &HashSet<(i64, i64)>) -> Result<(), Error> {
 
     let answer = fst.len();
 
-    println!("part2: {}", answer);
+    println!("part2: {answer}");
     Ok(())
 }
 

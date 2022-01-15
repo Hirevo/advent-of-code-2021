@@ -11,7 +11,7 @@ fn part1(deck: &[usize], boards: &[Board]) -> Result<(), Error> {
 
     let score = board.compute_score(marked);
 
-    println!("part1: {}", score);
+    println!("part1: {score}");
     Ok(())
 }
 
@@ -21,7 +21,7 @@ fn part2(deck: &[usize], boards: &[Board]) -> Result<(), Error> {
 
     let score = board.compute_score(marked);
 
-    println!("part2: {}", score);
+    println!("part2: {score}");
     Ok(())
 }
 

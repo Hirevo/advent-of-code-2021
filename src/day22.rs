@@ -544,7 +544,7 @@ fn part1(steps: &[Step]) -> Result<(), Error> {
 
     let answer = set.len();
 
-    println!("part1: {}", answer);
+    println!("part1: {answer}");
     Ok(())
 }
 
@@ -600,7 +600,7 @@ fn part2(steps: &[Step]) -> Result<(), Error> {
 
     let answer: i64 = cuboids.into_iter().map(|it| it.volume()).sum();
 
-    println!("part2: {}", answer);
+    println!("part2: {answer}");
     Ok(())
 }
 

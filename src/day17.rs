@@ -7,7 +7,7 @@ pub const INPUT_PATH: &str = "inputs/day17.txt";
 
 fn part1(_: i64, _: i64, min_y: i64, _: i64) -> Result<(), Error> {
     let answer = min_y.abs() * (min_y.abs() - 1) / 2;
-    println!("part1: {}", answer);
+    println!("part1: {answer}");
     Ok(())
 }
 
@@ -22,7 +22,7 @@ fn part2(min_x: i64, max_x: i64, min_y: i64, max_y: i64) -> Result<(), Error> {
         }
     }
 
-    println!("part2: {}", answer);
+    println!("part2: {answer}");
     Ok(())
 }
 

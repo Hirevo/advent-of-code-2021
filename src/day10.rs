@@ -29,7 +29,7 @@ fn part1(input: &[&str]) -> Result<(), Error> {
         })
     });
 
-    println!("part1: {}", answer);
+    println!("part1: {answer}");
     Ok(())
 }
 
@@ -73,7 +73,7 @@ fn part2(input: &[&str]) -> Result<(), Error> {
     let mid = answer.len() / 2;
     let (_, answer, _) = answer.select_nth_unstable(mid);
 
-    println!("part2: {}", answer);
+    println!("part2: {answer}");
     Ok(())
 }
 

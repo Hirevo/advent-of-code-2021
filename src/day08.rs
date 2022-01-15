@@ -99,7 +99,7 @@ fn part1(input: &[(Vec<Wires>, Vec<Wires>)]) -> Result<(), Error> {
         })
         .sum::<usize>();
 
-    println!("part1: {}", answer);
+    println!("part1: {answer}");
     Ok(())
 }
 
@@ -117,7 +117,7 @@ fn part2(input: &[(Vec<Wires>, Vec<Wires>)]) -> Result<(), Error> {
         })
         .sum::<usize>();
 
-    println!("part2: {}", answer);
+    println!("part2: {answer}");
     Ok(())
 }
 

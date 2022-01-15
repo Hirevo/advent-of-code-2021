@@ -18,7 +18,7 @@ fn part1(input: &[i64]) -> Result<(), Error> {
 
     let fuel = data.iter().map(|it| (median - it).abs()).sum::<i64>();
 
-    println!("part1: {}", fuel);
+    println!("part1: {fuel}");
     Ok(())
 }
 

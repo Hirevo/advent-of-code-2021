@@ -70,7 +70,7 @@ fn part1(p1: &Player, p2: &Player) -> Result<(), Error> {
         }
     };
 
-    println!("part1: {}", answer);
+    println!("part1: {answer}");
     Ok(())
 }
 
@@ -82,7 +82,7 @@ fn part2(p1: &Player, p2: &Player) -> Result<(), Error> {
 
     let answer = p1_wins.max(p2_wins);
 
-    println!("part2: {}", answer);
+    println!("part2: {answer}");
     Ok(())
 }
 
